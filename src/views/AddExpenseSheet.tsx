@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store/store';
 import { closeAddExpenseSheet } from '@/store/slices/uiSlice';
 import { db, LocalExpense, LocalExpensePayer, LocalExpenseSplit, LocalGroup, LocalGroupMember } from '@/lib/db/db';
-import { queueMutation } from '@/lib/sync/syncEngine';
+import { queueMutation, generateUuid } from '@/lib/sync/syncEngine';
 import { toMinorUnits, calculateExpenseSplits, SplitMode } from '@/lib/financial/financialEngine';
 import { triggerHaptic } from '@/utils/haptics';
 import {
@@ -146,7 +146,7 @@ export const AddExpenseSheet: React.FC = () => {
       });
 
       const now = new Date().toISOString();
-      const expenseId = `exp_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+      const expenseId = generateUuid();
 
       const newExpense: LocalExpense = {
         id: expenseId,
@@ -163,15 +163,15 @@ export const AddExpenseSheet: React.FC = () => {
 
       const payersData: LocalExpensePayer[] = [
         {
-          id: `pay_${Date.now()}_1`,
+          id: generateUuid(),
           expenseId,
           memberId: selectedPayerId,
           amountCents,
         },
       ];
 
-      const splitsData: LocalExpenseSplit[] = calculationResult.splits.map((s, idx) => ({
-        id: `split_${Date.now()}_${idx}`,
+      const splitsData: LocalExpenseSplit[] = calculationResult.splits.map((s) => ({
+        id: generateUuid(),
         expenseId,
         memberId: s.memberId,
         amountCents: s.amountCents,

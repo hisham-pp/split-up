@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store/store';
 import { db, LocalGroup, LocalGroupMember } from '@/lib/db/db';
-import { queueMutation, toValidUuid } from '@/lib/sync/syncEngine';
+import { queueMutation, toValidUuid, generateUuid } from '@/lib/sync/syncEngine';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase/supabase';
 import { setActiveGroup } from '@/store/slices/uiSlice';
 import { ArrowLeft, CheckCircle, Sparkles, AlertCircle } from 'lucide-react';
@@ -127,7 +127,7 @@ export default function JoinGroupPage({ params }: { params: Promise<{ inviteCode
 
         const now = new Date().toISOString();
         const newMember: LocalGroupMember = {
-          id: `mb_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+          id: generateUuid(),
           groupId: group.id,
           userId: user.id,
           memberName: user.fullName || 'New Member',

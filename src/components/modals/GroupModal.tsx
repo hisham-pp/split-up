@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal } from '@/components/ui/Modal';
 import { db, LocalGroup, LocalGroupMember } from '@/lib/db/db';
-import { queueMutation } from '@/lib/sync/syncEngine';
+import { queueMutation, generateUuid } from '@/lib/sync/syncEngine';
 import { Plus, Trash2, Users, Image as ImageIcon, Sparkles, ChevronDown } from 'lucide-react';
 
 interface GroupModalProps {
@@ -73,7 +73,7 @@ export const GroupModal: React.FC<GroupModalProps> = ({
         await queueMutation('UPDATE_GROUP', updatedGroup);
       } else {
         const newGroup: LocalGroup = {
-          id: `grp_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+          id: generateUuid(),
           name: name.trim(),
           category,
           coverImage: coverImage.trim() || 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=600&q=80',
@@ -87,7 +87,7 @@ export const GroupModal: React.FC<GroupModalProps> = ({
 
         // Add Current User as Owner
         const ownerMember: LocalGroupMember = {
-          id: `mb_${Date.now()}_owner`,
+          id: generateUuid(),
           groupId: newGroup.id,
           userId: currentUserId,
           memberName: 'You',
@@ -100,7 +100,7 @@ export const GroupModal: React.FC<GroupModalProps> = ({
         // Add requested members
         for (const mName of memberInputs) {
           const guestMember: LocalGroupMember = {
-            id: `mb_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+            id: generateUuid(),
             groupId: newGroup.id,
             memberName: mName,
             role: 'member',

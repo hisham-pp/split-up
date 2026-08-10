@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Modal } from '@/components/ui/Modal';
 import { db, LocalGroup, LocalGroupMember, LocalSettlement } from '@/lib/db/db';
-import { queueMutation } from '@/lib/sync/syncEngine';
+import { queueMutation, generateUuid } from '@/lib/sync/syncEngine';
 import { formatCurrency } from '@/utils/formatters';
 import { toMinorUnits, toMajorUnits } from '@/lib/financial/financialEngine';
 import { SimplifiedTransaction } from '@/lib/financial/debtSimplifier';
@@ -50,7 +50,7 @@ export const SettleUpModal: React.FC<SettleUpModalProps> = ({
       const now = new Date().toISOString();
 
       const newSettlement: LocalSettlement = {
-        id: `stl_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+        id: generateUuid(),
         groupId: group.id,
         payerMemberId: targetTx.fromMemberId,
         payeeMemberId: targetTx.toMemberId,
