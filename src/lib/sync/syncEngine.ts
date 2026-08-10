@@ -129,38 +129,6 @@ export async function processSyncQueue() {
       }
     }
 
-    // Push any local groups in Dexie that might not be on Supabase yet
-    const allLocalGroups = await db.groups.filter((g) => !g.deletedAt).toArray();
-    for (const lg of allLocalGroups) {
-      try {
-        await supabase.from('groups').upsert({
-          id: toValidUuid(lg.id),
-          name: lg.name,
-          category: lg.category,
-          cover_image: lg.coverImage,
-          created_by: toNullableUserUuid(lg.createdBy),
-          created_at: lg.createdAt,
-          updated_at: lg.updatedAt,
-        });
-
-        const lgMembers = await db.groupMembers.where('groupId').equals(lg.id).toArray();
-        for (const m of lgMembers) {
-          await supabase.from('group_members').upsert({
-            id: toValidUuid(m.id),
-            group_id: toValidUuid(m.groupId),
-            user_id: toNullableUserUuid(m.userId),
-            member_name: m.memberName,
-            member_email: m.memberEmail || null,
-            member_avatar: m.memberAvatar || null,
-            role: m.role || 'member',
-            joined_at: m.joinedAt,
-          });
-        }
-      } catch (e) {
-        console.error('Error syncing existing local group to Supabase:', e);
-      }
-    }
-
     // Pull Server Changes if Supabase is active
     await pullRemoteChanges();
     lastSyncedTime = new Date().toISOString();
