@@ -4,12 +4,13 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store/store';
 import { setActiveTab, setActiveGroup, openAddExpenseSheet, NavTab } from '@/store/slices/uiSlice';
-import { Home, Users, Activity, User, Plus, Sparkles, LogOut, Settings } from 'lucide-react';
-import { CURRENT_USER } from '@/store/api/expenseApi';
+import { openAuthModal, logout } from '@/store/slices/authSlice';
+import { Home, Users, Activity, User, Plus, Sparkles, LogIn, LogOut } from 'lucide-react';
 
 export const DesktopSidebar: React.FC = () => {
   const dispatch = useDispatch();
   const { activeTab } = useSelector((state: RootState) => state.ui);
+  const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   const navItems: { id: NavTab; label: string; icon: React.FC<{ className?: string }> }[] = [
     { id: 'home', label: 'Dashboard', icon: Home },
@@ -73,20 +74,45 @@ export const DesktopSidebar: React.FC = () => {
         })}
       </nav>
 
-      {/* User Card */}
+      {/* Dynamic User Profile Card */}
       <div className="pt-4 border-t border-slate-800/80">
-        <div className="flex items-center gap-3 p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
-          <img
-            src={CURRENT_USER.avatar}
-            alt={CURRENT_USER.name}
-            className="w-9 h-9 rounded-full object-cover ring-2 ring-indigo-500/30"
-          />
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-slate-200 truncate">
-              {CURRENT_USER.name}
-            </p>
-            <p className="text-xs text-slate-400 truncate">{CURRENT_USER.email}</p>
+        <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <img
+              src={
+                user?.avatarUrl ||
+                'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
+              }
+              alt={user?.fullName || 'User'}
+              className="w-9 h-9 rounded-full object-cover ring-2 ring-indigo-500/30 shrink-0"
+            />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-slate-200 truncate">
+                {user?.fullName || 'Guest User'}
+              </p>
+              <p className="text-xs text-slate-400 truncate">
+                {user?.email || 'guest@splitup.app'}
+              </p>
+            </div>
           </div>
+
+          {isAuthenticated ? (
+            <button
+              onClick={() => dispatch(logout())}
+              className="p-2 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-800 transition-colors"
+              title="Sign Out"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          ) : (
+            <button
+              onClick={() => dispatch(openAuthModal('login'))}
+              className="p-2 text-indigo-400 hover:text-indigo-300 rounded-lg hover:bg-indigo-600/20 transition-colors"
+              title="Sign In"
+            >
+              <LogIn className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </div>
     </aside>

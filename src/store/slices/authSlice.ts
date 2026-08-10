@@ -19,14 +19,17 @@ interface AuthState {
   error: string | null;
 }
 
+const DEFAULT_GUEST_USER: UserProfile = {
+  id: 'usr_guest',
+  email: 'guest@splitup.app',
+  fullName: 'Guest User',
+  avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+  isGuest: true,
+};
+
 const initialState: AuthState = {
-  user: {
-    id: 'usr_hisham',
-    email: 'hisham@example.com',
-    fullName: 'Hisham',
-    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
-  },
-  isAuthenticated: true,
+  user: DEFAULT_GUEST_USER,
+  isAuthenticated: false,
   isLoading: false,
   authModalOpen: false,
   authMode: 'login',
@@ -38,8 +41,8 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setUser(state, action: PayloadAction<UserProfile | null>) {
-      state.user = action.payload;
-      state.isAuthenticated = Boolean(action.payload);
+      state.user = action.payload || DEFAULT_GUEST_USER;
+      state.isAuthenticated = Boolean(action.payload && !action.payload.isGuest);
       state.isLoading = false;
       state.error = null;
     },
@@ -60,7 +63,7 @@ const authSlice = createSlice({
       state.error = null;
     },
     logout(state) {
-      state.user = null;
+      state.user = DEFAULT_GUEST_USER;
       state.isAuthenticated = false;
       if (isSupabaseConfigured && supabase) {
         supabase.auth.signOut().catch(() => {});
@@ -98,6 +101,7 @@ export async function initializeAuthSession(dispatch: any) {
           email: session.user.email || 'user@example.com',
           fullName: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'User',
           avatarUrl: session.user.user_metadata?.avatar_url,
+          isGuest: false,
         };
 
         // Cache in Dexie for offline restoration
@@ -123,13 +127,14 @@ export async function initializeAuthSession(dispatch: any) {
           email: cachedProfile.email,
           fullName: cachedProfile.fullName,
           avatarUrl: cachedProfile.avatarUrl,
+          isGuest: false,
         })
       );
     } else {
-      dispatch(setAuthLoading(false));
+      dispatch(setUser(DEFAULT_GUEST_USER));
     }
   } catch (err: any) {
     console.error('Failed to restore auth session:', err);
-    dispatch(setAuthLoading(false));
+    dispatch(setUser(DEFAULT_GUEST_USER));
   }
 }

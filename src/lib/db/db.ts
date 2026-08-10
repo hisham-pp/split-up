@@ -136,9 +136,9 @@ export async function seedInitialLocalData() {
 
   // Create default current user profile
   const currentUser: LocalProfile = {
-    id: 'usr_hisham',
-    email: 'hisham@example.com',
-    fullName: 'Hisham',
+    id: 'usr_guest',
+    email: 'guest@splitup.app',
+    fullName: 'Guest User',
     avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
     updatedAt: now,
   };
