@@ -97,7 +97,8 @@ export const GroupDetailView: React.FC<GroupDetailViewProps> = ({ group }) => {
 
   const getMemberName = (id: string) => {
     const m = members.find((mem) => mem.id === id);
-    return m ? m.memberName : 'Member';
+    if (!m) return 'Member';
+    return m.userId && m.userId === currentUser?.id ? 'You' : m.memberName;
   };
 
   const totalGroupSpendCents = expenses.reduce((acc, e) => acc + e.amountCents, 0);
@@ -241,7 +242,9 @@ export const GroupDetailView: React.FC<GroupDetailViewProps> = ({ group }) => {
                     className="w-10 h-10 rounded-full object-cover"
                   />
                   <div>
-                    <p className="text-sm font-medium text-on-surface">{m.memberName}</p>
+                    <p className="text-sm font-medium text-on-surface">
+                      {m.userId && m.userId === currentUser?.id ? 'You' : m.memberName}
+                    </p>
                     <p className="text-xs text-on-surface-variant font-medium">
                       Paid {formatCurrency(toMajorUnits(balInfo.totalPaid), currency)}
                     </p>

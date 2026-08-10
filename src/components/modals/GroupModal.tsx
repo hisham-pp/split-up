@@ -5,6 +5,8 @@ import { Modal } from '@/components/ui/Modal';
 import { db, LocalGroup, LocalGroupMember } from '@/lib/db/db';
 import { queueMutation, generateUuid } from '@/lib/sync/syncEngine';
 import { Plus, Trash2, Users, Image as ImageIcon, Sparkles, ChevronDown } from 'lucide-react';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
 
 interface GroupModalProps {
   isOpen: boolean;
@@ -21,6 +23,7 @@ export const GroupModal: React.FC<GroupModalProps> = ({
   onGroupSaved,
   currentUserId,
 }) => {
+  const user = useSelector((state: RootState) => state.auth.user);
   const [name, setName] = useState('');
   const [category, setCategory] = useState('Travel');
   const [coverImage, setCoverImage] = useState('');
@@ -90,7 +93,7 @@ export const GroupModal: React.FC<GroupModalProps> = ({
           id: generateUuid(),
           groupId: newGroup.id,
           userId: currentUserId,
-          memberName: 'You',
+          memberName: user?.fullName || 'Owner',
           role: 'owner',
           joinedAt: now,
         };
