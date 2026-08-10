@@ -33,8 +33,10 @@ export const HomeView: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const loadData = async () => {
-    const activeGroups = await db.groups.where('deletedAt').equals(null).toArray();
-    const activeExpenses = await db.expenses.where('deletedAt').equals(null).reverse().sortBy('date');
+    const activeGroups = await db.groups.filter((g) => !g.deletedAt).toArray();
+    const activeExpenses = (await db.expenses.filter((e) => !e.deletedAt).toArray()).sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
 
     setGroups(activeGroups);
     setExpenses(activeExpenses);

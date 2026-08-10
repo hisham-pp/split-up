@@ -50,7 +50,7 @@ export const AddExpenseSheet: React.FC = () => {
   // Load groups from IndexedDB
   useEffect(() => {
     async function loadGroups() {
-      const gList = await db.groups.where('deletedAt').equals(null).toArray();
+      const gList = await db.groups.filter((g) => !g.deletedAt).toArray();
       setGroups(gList);
       if (activeGroup) {
         setSelectedGroupId(activeGroup.id);

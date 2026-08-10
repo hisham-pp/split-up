@@ -23,7 +23,7 @@ export const GroupsView: React.FC = () => {
   const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
 
   const loadGroups = async () => {
-    const activeGroups = await db.groups.where('deletedAt').equals(null).toArray();
+    const activeGroups = await db.groups.filter((g) => !g.deletedAt).toArray();
     setGroups(activeGroups);
 
     const gBalMap: Record<string, number> = {};
