@@ -105,8 +105,8 @@ export const GroupDetailView: React.FC<GroupDetailViewProps> = ({ group }) => {
   return (
     <div className="space-y-6 pb-6 animate-fade-in">
       {/* Group Detail Banner Header */}
-      <div className="relative rounded-2xl overflow-hidden bg-surface-container-low">
-        <div className="h-36 sm:h-44 w-full relative">
+      <div className="relative rounded-b-[32px] overflow-hidden bg-surface-container-low shadow-sm -mt-4 mx-[-16px]">
+        <div className="h-40 sm:h-52 w-full relative">
           <img
             src={
               group.coverImage ||
@@ -115,29 +115,19 @@ export const GroupDetailView: React.FC<GroupDetailViewProps> = ({ group }) => {
             alt={group.name}
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
-
-          <button
-            onClick={() => {
-              triggerHaptic(10);
-              dispatch(setActiveGroup(null));
-            }}
-            className="absolute top-4 left-4 p-2.5 rounded-full bg-surface/70 text-on-surface hover:bg-surface backdrop-blur-md transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
+          <div className="absolute inset-0 bg-gradient-to-t from-surface-container-low via-surface-container-low/40 to-transparent" />
 
           <div className="absolute top-4 right-4 flex gap-2">
             <button
               onClick={() => setIsEditGroupModalOpen(true)}
-              className="p-2.5 rounded-full bg-surface/70 text-on-surface hover:bg-surface backdrop-blur-md transition-colors"
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container/60 text-on-surface hover:bg-surface-container backdrop-blur-md transition-all active:scale-95"
               title="Edit Group"
             >
               <Edit className="w-4 h-4" />
             </button>
             <button
               onClick={() => setIsInviteModalOpen(true)}
-              className="p-2.5 rounded-full bg-surface/70 text-on-surface hover:bg-surface backdrop-blur-md transition-colors"
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container/60 text-on-surface hover:bg-surface-container backdrop-blur-md transition-all active:scale-95"
               title="Invite Members"
             >
               <Share2 className="w-4 h-4" />
@@ -145,30 +135,33 @@ export const GroupDetailView: React.FC<GroupDetailViewProps> = ({ group }) => {
           </div>
         </div>
 
-        <div className="p-6 -mt-12 relative z-10">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div className="px-6 pb-6 pt-2 relative z-10">
+          <div className="flex flex-col gap-4">
             <div>
-              <span className="px-3 py-1 rounded-full bg-surface-variant text-on-surface-variant text-xs font-medium uppercase tracking-wider">
-                {group.category}
-              </span>
-              <h1 className="text-2xl sm:text-3xl font-semibold text-on-surface tracking-tight mt-2">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="px-3 py-1 rounded-full bg-surface-variant text-on-surface-variant text-[10px] font-bold uppercase tracking-widest border border-outline/10">
+                  {group.category}
+                </span>
+                <span className="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container text-[10px] font-bold uppercase tracking-widest border border-outline/10 flex items-center gap-1">
+                  <Users className="w-3 h-3" />
+                  {members.length} members
+                </span>
+              </div>
+              <h1 className="text-[32px] sm:text-[40px] leading-tight font-medium text-on-surface tracking-tight mb-1">
                 {group.name}
               </h1>
-              <p className="text-xs text-on-surface-variant mt-1 flex items-center gap-2 font-medium">
-                <Users className="w-3.5 h-3.5" />
-                <span>{members.length} members</span>
-                <span>•</span>
-                <span>Total Spend: {formatCurrency(toMajorUnits(totalGroupSpendCents), currency)}</span>
+              <p className="text-sm text-on-surface-variant font-medium">
+                Total Spend: {formatCurrency(toMajorUnits(totalGroupSpendCents), currency)}
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex gap-2 mt-2">
               <button
                 onClick={() => {
                   triggerHaptic(10);
                   dispatch(openAddExpenseSheet());
                 }}
-                className="px-4 py-2 rounded-full bg-primary-container text-on-primary-container text-sm font-medium transition-all active:scale-95 flex items-center gap-1.5 shadow-sm shadow-primary-container/20"
+                className="flex-1 h-12 rounded-full bg-primary text-on-primary font-medium text-sm transition-all hover:bg-primary/90 active:scale-[0.98] shadow-sm flex items-center justify-center gap-2"
               >
                 <Plus className="w-4 h-4" />
                 <span>Add Expense</span>
@@ -176,15 +169,15 @@ export const GroupDetailView: React.FC<GroupDetailViewProps> = ({ group }) => {
 
               <button
                 onClick={() => setIsSettleModalOpen(true)}
-                className="px-4 py-2 rounded-full bg-surface-container text-on-surface text-sm font-medium transition-all active:scale-95 flex items-center gap-1.5"
+                className="px-6 h-12 rounded-full bg-primary-container text-on-primary-container text-sm font-medium transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-sm"
               >
                 <CheckCircle className="w-4 h-4" />
-                <span>Settle Up</span>
+                <span>Settle</span>
               </button>
 
               <button
                 onClick={() => setIsExportModalOpen(true)}
-                className="p-2 rounded-full bg-surface-container text-on-surface transition-all hover:bg-surface-container-high"
+                className="w-12 h-12 flex items-center justify-center rounded-full bg-surface-container-highest text-on-surface transition-all active:scale-95"
                 title="Export Data"
               >
                 <Download className="w-4 h-4" />
