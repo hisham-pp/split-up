@@ -94,9 +94,9 @@ export const GroupsView: React.FC = () => {
             triggerHaptic(10);
             setIsGroupModalOpen(true);
           }}
-          className="px-4 py-2.5 rounded-md bg-primary hover:bg-surface-variant text-on-primary hover:text-on-surface border border-outline/30 text-xs font-bold transition-all active:scale-95 flex items-center gap-1.5"
+          className="px-4 py-2 rounded-full bg-primary-container text-on-primary-container font-medium text-sm transition-all active:scale-95 flex items-center gap-1.5 shadow-sm shadow-primary-container/20"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-5 h-5" />
           <span>New Group</span>
         </button>
       </div>
@@ -118,15 +118,15 @@ export const GroupsView: React.FC = () => {
           )}
         </div>
 
-        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+        <div className="flex gap-2 overflow-x-auto pb-1 hide-scrollbar">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-3 py-1.5 rounded-sm border text-xs font-bold shrink-0 transition-all ${
+              className={`px-4 py-1.5 rounded-full text-xs font-medium shrink-0 transition-all ${
                 selectedCategory === cat
-                  ? 'bg-surface-variant text-on-surface border-outline/30'
-                  : 'bg-surface border-outline/20 text-on-surface-variant hover:text-on-surface'
+                  ? 'bg-primary-container text-on-primary-container'
+                  : 'bg-transparent border border-outline/30 text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
               }`}
             >
               {cat}
@@ -158,7 +158,7 @@ export const GroupsView: React.FC = () => {
                   triggerHaptic(10);
                   dispatch(setActiveGroup(group as any));
                 }}
-                className="group relative overflow-hidden rounded-md bg-surface-container border border-outline/20 hover:border-primary p-5 transition-all cursor-pointer active:scale-95"
+                className="group relative overflow-hidden rounded-2xl bg-surface-container-low hover:bg-surface-container transition-all cursor-pointer active:scale-95 p-4"
               >
                 <div className="flex items-center gap-4">
                   <img
@@ -167,22 +167,22 @@ export const GroupsView: React.FC = () => {
                       'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=600&q=80'
                     }
                     alt={group.name}
-                    className="w-14 h-14 rounded-md object-cover border border-outline/30 shrink-0"
+                    className="w-14 h-14 rounded-2xl object-cover shrink-0"
                   />
 
                   <div className="min-w-0 flex-1">
-                    <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
+                    <span className="text-[10px] font-medium text-on-surface-variant uppercase tracking-wider">
                       {group.category}
                     </span>
-                    <h3 className="text-base font-bold text-on-surface truncate group-hover:text-primary transition-colors">
+                    <h3 className="text-base font-semibold text-on-surface truncate">
                       {group.name}
                     </h3>
                     <p
-                      className={`text-xs font-bold mt-1 ${
+                      className={`text-xs font-medium mt-1 ${
                         netBal > 0
-                          ? 'text-primary'
+                          ? 'text-positive'
                           : netBal < 0
-                          ? 'text-error'
+                          ? 'text-negative'
                           : 'text-on-surface-variant'
                       }`}
                     >

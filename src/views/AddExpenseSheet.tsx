@@ -205,11 +205,14 @@ export const AddExpenseSheet: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-background/95 animate-fade-in">
-      <div className="relative w-full max-w-lg bg-surface border-t sm:border border-outline/30 rounded-t-lg sm:rounded-lg p-6 overflow-hidden max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
+      <div className="relative w-full max-w-lg bg-surface-container-lowest rounded-t-[28px] sm:rounded-3xl p-6 overflow-hidden max-h-[90vh] overflow-y-auto shadow-xl">
+        <div className="w-full flex justify-center pb-4 sm:hidden">
+          <div className="w-8 h-1 bg-outline-variant rounded-full"></div>
+        </div>
         <button
           onClick={() => dispatch(closeAddExpenseSheet())}
-          className="absolute top-4 right-4 p-2 text-on-surface-variant hover:text-on-surface rounded-md hover:bg-surface-variant transition-colors"
+          className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center text-on-surface hover:bg-surface-container-highest rounded-full transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
@@ -249,25 +252,9 @@ export const AddExpenseSheet: React.FC = () => {
             </select>
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-on-surface mb-1">
-              Expense Title *
-            </label>
-            <input
-              type="text"
-              required
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. Seafood Dinner at Britto's"
-              className="w-full bg-surface-container border border-outline/30 rounded-md px-4 py-2.5 text-sm text-on-surface focus:outline-none focus:border-primary"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-on-surface mb-1">
-                Amount (₹) *
-              </label>
+          <div className="flex flex-col items-center justify-center py-6">
+            <div className="text-5xl font-normal text-on-surface flex items-baseline tracking-tight">
+              <span className="text-3xl text-on-surface-variant mr-1">₹</span>
               <input
                 type="number"
                 step="0.01"
@@ -275,7 +262,23 @@ export const AddExpenseSheet: React.FC = () => {
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 placeholder="0.00"
-                className="w-full bg-surface-container border border-outline/30 rounded-md px-4 py-2.5 text-sm font-bold text-on-surface focus:outline-none focus:border-primary"
+                className="w-[150px] bg-transparent text-center border-none text-5xl font-normal text-on-surface focus:outline-none focus:ring-0 p-0 m-0"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-on-surface-variant mb-1 ml-1">
+                Expense Title *
+              </label>
+              <input
+                type="text"
+                required
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="e.g. Seafood Dinner"
+                className="w-full bg-surface-container-highest border-b border-on-surface-variant rounded-t-lg px-4 py-3 text-sm text-on-surface focus:outline-none focus:border-primary focus:border-b-2 transition-all"
               />
             </div>
 
@@ -317,22 +320,22 @@ export const AddExpenseSheet: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-on-surface mb-2">
-              Split Mode
+            <label className="block text-sm font-medium text-on-surface-variant mb-2">
+              Split type
             </label>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="flex bg-surface-container p-1 rounded-full">
               {(['Equal', 'Unequal', 'Percentage', 'Shares'] as SplitMode[]).map((mode) => (
                 <button
                   key={mode}
                   type="button"
                   onClick={() => setSplitMode(mode)}
-                  className={`py-2 rounded-md text-xs font-bold transition-all border ${
+                  className={`flex-1 py-2 rounded-full text-sm font-medium transition-colors ${
                     splitMode === mode
-                      ? 'bg-primary border-primary text-on-primary'
-                      : 'bg-surface-container border-outline/30 text-on-surface-variant hover:text-on-surface'
+                      ? 'bg-primary-container text-on-primary-container'
+                      : 'text-on-surface-variant hover:bg-surface-container-highest'
                   }`}
                 >
-                  {mode}
+                  {mode === 'Percentage' ? '%' : mode}
                 </button>
               ))}
             </div>
@@ -444,9 +447,9 @@ export const AddExpenseSheet: React.FC = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-3.5 mt-2 rounded-md bg-primary hover:bg-surface-variant text-on-primary hover:text-on-surface font-bold text-sm border border-outline/30 transition-all active:scale-95 flex items-center justify-center gap-2"
+            className="w-full h-14 mt-4 rounded-full bg-primary text-on-primary font-medium text-sm transition-all hover:bg-primary/90 active:scale-[0.98] flex items-center justify-center gap-2 shadow-sm"
           >
-            <Plus className="w-4 h-4" />
+            <Check className="w-5 h-5" />
             <span>Save Expense</span>
           </button>
         </form>
