@@ -72,6 +72,13 @@ export function toValidUuid(id?: string | null): string {
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-4${hex.slice(13, 16)}-a${hex.slice(17, 20)}-${hex.slice(20, 32)}`;
 }
 
+export function toNullableUserUuid(id?: string | null): string | null {
+  if (!id) return null;
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+  if (isUuid && !id.startsWith('usr_')) return id;
+  return null;
+}
+
 /**
  * Main Sync Loop: Processes pending items in the offline queue and pulls server updates.
  */
@@ -131,7 +138,7 @@ export async function processSyncQueue() {
           name: lg.name,
           category: lg.category,
           cover_image: lg.coverImage,
-          created_by: toValidUuid(lg.createdBy),
+          created_by: toNullableUserUuid(lg.createdBy),
           created_at: lg.createdAt,
           updated_at: lg.updatedAt,
         });
@@ -141,7 +148,7 @@ export async function processSyncQueue() {
           await supabase.from('group_members').upsert({
             id: toValidUuid(m.id),
             group_id: toValidUuid(m.groupId),
-            user_id: toValidUuid(m.userId),
+            user_id: toNullableUserUuid(m.userId),
             member_name: m.memberName,
             member_email: m.memberEmail || null,
             member_avatar: m.memberAvatar || null,
@@ -180,7 +187,7 @@ async function executeRemoteMutation(item: SyncQueueItem) {
         name: payload.name,
         category: payload.category,
         cover_image: payload.coverImage,
-        created_by: toValidUuid(payload.createdBy),
+        created_by: toNullableUserUuid(payload.createdBy),
         created_at: payload.createdAt,
         updated_at: payload.updatedAt,
       });
@@ -208,7 +215,7 @@ async function executeRemoteMutation(item: SyncQueueItem) {
       const { error } = await supabase.from('group_members').upsert({
         id: toValidUuid(payload.id),
         group_id: toValidUuid(payload.groupId),
-        user_id: toValidUuid(payload.userId),
+        user_id: toNullableUserUuid(payload.userId),
         member_name: payload.memberName,
         member_email: payload.memberEmail || null,
         member_avatar: payload.memberAvatar || null,
@@ -235,7 +242,7 @@ async function executeRemoteMutation(item: SyncQueueItem) {
         split_mode: expense.splitMode,
         date: expense.date,
         notes: expense.notes,
-        created_by: toValidUuid(expense.createdBy),
+        created_by: toNullableUserUuid(expense.createdBy),
         created_at: expense.createdAt,
         updated_at: expense.updatedAt,
       });
