@@ -316,6 +316,19 @@ async function pullRemoteChanges() {
         joinedAt: m.joined_at,
       });
     }
+
+    // Deduplicate: if a ghost placeholder (no userId) has the same name as a real
+    // user-linked member in the same group, remove the ghost locally.
+    const allLocalMembers = await db.groupMembers.toArray();
+    const realMembers = allLocalMembers.filter((m) => !!m.userId);
+    for (const real of realMembers) {
+      const ghosts = allLocalMembers.filter(
+        (m) => !m.userId && m.groupId === real.groupId && m.memberName === real.memberName
+      );
+      for (const ghost of ghosts) {
+        await db.groupMembers.delete(ghost.id);
+      }
+    }
   }
 
   // Pull expenses
