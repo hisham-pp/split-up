@@ -93,22 +93,22 @@ export const SwipeableExpenseCard: React.FC<SwipeableExpenseCardProps> = ({
   };
 
   return (
-    <div className="relative w-full overflow-hidden rounded-2xl bg-slate-900 border border-slate-800 my-2">
+    <div className="relative w-full overflow-hidden rounded-md bg-surface-container border border-outline/20 my-2">
       {/* Background Actions (revealed on swipe left) */}
-      <div className="absolute inset-y-0 right-0 flex items-center pr-3 gap-2 bg-slate-950/90 z-0">
+      <div className="absolute inset-y-0 right-0 flex items-center pr-3 gap-2 bg-surface/90 z-0">
         <button
           onClick={() => {
             setTranslateX(0);
             onEdit?.(expense);
           }}
-          className="w-11 h-11 rounded-xl bg-indigo-600/30 text-indigo-400 border border-indigo-500/40 flex items-center justify-center active:scale-90 transition-transform"
+          className="w-11 h-11 rounded-md bg-surface-variant text-on-surface border border-outline/30 flex items-center justify-center active:scale-90 transition-transform"
           aria-label="Edit"
         >
           <Edit3 className="w-4 h-4" />
         </button>
         <button
           onClick={handleDelete}
-          className="w-11 h-11 rounded-xl bg-rose-600/30 text-rose-400 border border-rose-500/40 flex items-center justify-center active:scale-90 transition-transform"
+          className="w-11 h-11 rounded-md bg-error text-on-error border border-error flex items-center justify-center active:scale-90 transition-transform"
           aria-label="Delete"
         >
           <Trash2 className="w-4 h-4" />
@@ -124,28 +124,28 @@ export const SwipeableExpenseCard: React.FC<SwipeableExpenseCardProps> = ({
           transform: `translateX(${translateX}px)`,
           transition: isSwiping ? 'none' : 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
         }}
-        className="relative z-10 flex items-center justify-between p-4 bg-slate-900 hover:bg-slate-800/60 active:bg-slate-800 transition-colors"
+        className="relative z-10 flex items-center justify-between p-4 bg-surface-container hover:bg-surface-variant active:bg-surface-variant transition-colors"
       >
         <div className="flex items-center gap-3.5 min-w-0">
-          <div className="w-11 h-11 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0">
+          <div className="w-11 h-11 rounded-md bg-surface-variant border border-outline/20 text-on-surface flex items-center justify-center shrink-0">
             <CategoryIcon className="w-5 h-5 stroke-[2]" />
           </div>
 
           <div className="min-w-0 flex-1">
-            <h3 className="font-semibold text-slate-100 text-sm sm:text-base truncate">
+            <h3 className="font-semibold text-on-surface text-sm sm:text-base truncate">
               {expense.title}
             </h3>
-            <p className="text-xs text-slate-400 truncate">
-              <span className="text-indigo-300 font-medium">{expense.groupName}</span> · {formatDateRelative(expense.date)}
+            <p className="text-xs text-on-surface-variant truncate">
+              <span className="text-primary font-bold">{expense.groupName}</span> · {formatDateRelative(expense.date)}
             </p>
           </div>
         </div>
 
         <div className="text-right shrink-0 ml-3">
-          <p className="font-bold text-slate-100 text-base">
+          <p className="font-bold text-on-surface text-base">
             {formatCurrency(expense.amount, currency)}
           </p>
-          <p className="text-[11px] font-medium text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full inline-block mt-0.5">
+          <p className="text-[11px] font-bold text-primary bg-surface-variant px-2 py-0.5 rounded-sm inline-block mt-0.5 border border-outline/20">
             {expense.splitMode}
           </p>
         </div>

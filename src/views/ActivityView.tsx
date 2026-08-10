@@ -77,30 +77,30 @@ export const ActivityView: React.FC = () => {
   return (
     <div className="space-y-6 pb-6 animate-fade-in">
       <div>
-        <h1 className="text-2xl font-extrabold text-slate-100 tracking-tight">Recent Activity</h1>
-        <p className="text-xs text-slate-400 mt-0.5">Audit log of all expenses and settlements</p>
+        <h1 className="text-2xl font-bold text-on-surface tracking-tight">Recent Activity</h1>
+        <p className="text-xs text-on-surface-variant mt-0.5">Audit log of all expenses and settlements</p>
       </div>
 
       {activities.length === 0 ? (
-        <div className="p-8 text-center bg-slate-900/40 rounded-2xl border border-slate-800">
-          <Activity className="w-8 h-8 text-indigo-400 mx-auto mb-2 opacity-60" />
-          <p className="text-sm font-medium text-slate-400">No activity recorded yet</p>
+        <div className="p-8 text-center bg-surface-container rounded-md border border-outline/20">
+          <Activity className="w-8 h-8 text-on-surface-variant mx-auto mb-2" />
+          <p className="text-sm font-medium text-on-surface-variant">No activity recorded yet</p>
         </div>
       ) : (
         <div className="space-y-3">
           {activities.map((act) => (
             <div
               key={act.id}
-              className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between"
+              className="p-4 rounded-md bg-surface-container border border-outline/20 flex items-center justify-between"
             >
               <div className="flex items-center gap-3">
                 <div
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                  className={`w-10 h-10 rounded-md flex items-center justify-center shrink-0 border ${
                     act.type === 'expense_added'
-                      ? 'bg-indigo-500/15 text-indigo-400'
+                      ? 'bg-primary text-on-primary border-primary'
                       : act.type === 'settlement'
-                      ? 'bg-emerald-500/15 text-emerald-400'
-                      : 'bg-rose-500/15 text-rose-400'
+                      ? 'bg-surface-variant text-on-surface border-outline/30'
+                      : 'bg-error text-on-error border-error/50'
                   }`}
                 >
                   {act.type === 'expense_added' && <CreditCard className="w-5 h-5" />}
@@ -110,20 +110,20 @@ export const ActivityView: React.FC = () => {
 
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-slate-200">{act.title}</span>
-                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-slate-800 text-slate-400">
+                    <span className="text-xs font-bold text-on-surface">{act.title}</span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-sm bg-surface-variant text-on-surface-variant border border-outline/20">
                       {act.groupName}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-400 mt-0.5">{act.description}</p>
-                  <p className="text-[10px] text-slate-500 mt-0.5">
+                  <p className="text-xs text-on-surface-variant mt-0.5">{act.description}</p>
+                  <p className="text-[10px] text-on-surface-variant mt-0.5 font-medium">
                     {new Date(act.date).toLocaleString()}
                   </p>
                 </div>
               </div>
 
               {act.amountCents && (
-                <div className="text-right font-bold text-sm text-slate-200">
+                <div className="text-right font-bold text-sm text-on-surface">
                   {formatCurrency(toMajorUnits(act.amountCents), currency)}
                 </div>
               )}

@@ -105,7 +105,7 @@ export const GroupDetailView: React.FC<GroupDetailViewProps> = ({ group }) => {
   return (
     <div className="space-y-6 pb-6 animate-fade-in">
       {/* Group Detail Banner Header */}
-      <div className="relative rounded-3xl overflow-hidden bg-slate-900 border border-slate-800 shadow-xl">
+      <div className="relative rounded-lg overflow-hidden bg-surface-container border border-outline/20">
         <div className="h-36 sm:h-44 w-full relative">
           <img
             src={
@@ -115,14 +115,14 @@ export const GroupDetailView: React.FC<GroupDetailViewProps> = ({ group }) => {
             alt={group.name}
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
 
           <button
             onClick={() => {
               triggerHaptic(10);
               dispatch(setActiveGroup(null));
             }}
-            className="absolute top-4 left-4 p-2.5 rounded-full bg-slate-950/70 text-slate-200 hover:bg-slate-950 transition-colors backdrop-blur-md"
+            className="absolute top-4 left-4 p-2.5 rounded-md bg-surface/70 text-on-surface hover:bg-surface border border-outline/20 backdrop-blur-md"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
@@ -130,14 +130,14 @@ export const GroupDetailView: React.FC<GroupDetailViewProps> = ({ group }) => {
           <div className="absolute top-4 right-4 flex gap-2">
             <button
               onClick={() => setIsEditGroupModalOpen(true)}
-              className="p-2.5 rounded-full bg-slate-950/70 text-slate-200 hover:bg-slate-950 transition-colors backdrop-blur-md"
+              className="p-2.5 rounded-md bg-surface/70 text-on-surface hover:bg-surface border border-outline/20 backdrop-blur-md"
               title="Edit Group"
             >
               <Edit className="w-4 h-4" />
             </button>
             <button
               onClick={() => setIsInviteModalOpen(true)}
-              className="p-2.5 rounded-full bg-slate-950/70 text-slate-200 hover:bg-slate-950 transition-colors backdrop-blur-md"
+              className="p-2.5 rounded-md bg-surface/70 text-on-surface hover:bg-surface border border-outline/20 backdrop-blur-md"
               title="Invite Members"
             >
               <Share2 className="w-4 h-4" />
@@ -148,13 +148,13 @@ export const GroupDetailView: React.FC<GroupDetailViewProps> = ({ group }) => {
         <div className="p-6 -mt-12 relative z-10">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
-              <span className="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold uppercase tracking-wider">
+              <span className="px-3 py-1 rounded-sm bg-surface-variant text-on-surface border border-outline/20 text-xs font-bold uppercase tracking-wider">
                 {group.category}
               </span>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mt-1">
+              <h1 className="text-2xl sm:text-3xl font-bold text-on-surface tracking-tight mt-2">
                 {group.name}
               </h1>
-              <p className="text-xs text-slate-400 mt-1 flex items-center gap-2">
+              <p className="text-xs text-on-surface-variant mt-1 flex items-center gap-2 font-medium">
                 <Users className="w-3.5 h-3.5" />
                 <span>{members.length} members</span>
                 <span>•</span>
@@ -168,7 +168,7 @@ export const GroupDetailView: React.FC<GroupDetailViewProps> = ({ group }) => {
                   triggerHaptic(10);
                   dispatch(openAddExpenseSheet());
                 }}
-                className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-lg shadow-indigo-600/30 transition-all active:scale-95 flex items-center gap-1.5"
+                className="px-4 py-2.5 rounded-md bg-primary hover:bg-surface-variant text-on-primary hover:text-on-surface border border-outline/30 text-xs font-bold transition-all active:scale-95 flex items-center gap-1.5"
               >
                 <Plus className="w-4 h-4" />
                 <span>Add Expense</span>
@@ -176,7 +176,7 @@ export const GroupDetailView: React.FC<GroupDetailViewProps> = ({ group }) => {
 
               <button
                 onClick={() => setIsSettleModalOpen(true)}
-                className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-lg shadow-emerald-600/30 transition-all active:scale-95 flex items-center gap-1.5"
+                className="px-4 py-2.5 rounded-md bg-surface-container hover:bg-surface-variant border border-outline/30 text-on-surface text-xs font-bold transition-all active:scale-95 flex items-center gap-1.5"
               >
                 <CheckCircle className="w-4 h-4" />
                 <span>Settle Up</span>
@@ -184,7 +184,7 @@ export const GroupDetailView: React.FC<GroupDetailViewProps> = ({ group }) => {
 
               <button
                 onClick={() => setIsExportModalOpen(true)}
-                className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all"
+                className="p-2.5 rounded-md bg-surface-container hover:bg-surface-variant border border-outline/30 text-on-surface transition-all"
                 title="Export Data"
               >
                 <Download className="w-4 h-4" />
@@ -196,27 +196,27 @@ export const GroupDetailView: React.FC<GroupDetailViewProps> = ({ group }) => {
 
       {/* Simplified Debts Recommendation Banner */}
       {simplifiedTxs.length > 0 && (
-        <div className="p-5 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl space-y-3">
+        <div className="p-5 rounded-lg bg-surface-container border border-outline/20 space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-indigo-300 uppercase tracking-wider flex items-center gap-1.5">
-              <TrendingUp className="w-4 h-4 text-indigo-400" />
+            <h3 className="text-xs font-bold text-on-surface uppercase tracking-wider flex items-center gap-1.5">
+              <TrendingUp className="w-4 h-4 text-on-surface-variant" />
               <span>Simplified Debt Settlement Plan</span>
             </h3>
-            <span className="text-[11px] text-slate-400">{simplifiedTxs.length} payments to settle group</span>
+            <span className="text-[11px] text-on-surface-variant font-medium">{simplifiedTxs.length} payments to settle group</span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {simplifiedTxs.map((tx, idx) => (
               <div
                 key={idx}
-                className="p-3 rounded-2xl bg-slate-950 border border-slate-800/80 flex items-center justify-between"
+                className="p-3 rounded-md bg-background border border-outline/30 flex items-center justify-between"
               >
                 <div className="flex items-center gap-2 text-xs">
-                  <span className="font-semibold text-slate-200">{getMemberName(tx.fromMemberId)}</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-slate-500" />
-                  <span className="font-semibold text-slate-200">{getMemberName(tx.toMemberId)}</span>
+                  <span className="font-bold text-on-surface">{getMemberName(tx.fromMemberId)}</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-on-surface-variant" />
+                  <span className="font-bold text-on-surface">{getMemberName(tx.toMemberId)}</span>
                 </div>
-                <span className="font-bold text-emerald-400 text-xs">
+                <span className="font-bold text-primary text-xs">
                   {formatCurrency(toMajorUnits(tx.amountCents), currency)}
                 </span>
               </div>
@@ -226,8 +226,8 @@ export const GroupDetailView: React.FC<GroupDetailViewProps> = ({ group }) => {
       )}
 
       {/* Group Members & Individual Net Balances */}
-      <div className="p-5 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl">
-        <h3 className="text-sm font-bold text-slate-100 mb-3">Group Members</h3>
+      <div className="p-5 rounded-lg bg-surface-container border border-outline/20">
+        <h3 className="text-sm font-bold text-on-surface mb-3">Group Members</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {members.map((m) => {
             const balInfo = balances[m.id] || { totalPaid: 0, totalOwed: 0, netBalance: 0 };
@@ -236,7 +236,7 @@ export const GroupDetailView: React.FC<GroupDetailViewProps> = ({ group }) => {
             return (
               <div
                 key={m.id}
-                className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800/80 flex items-center justify-between"
+                className="p-3.5 rounded-md bg-background border border-outline/30 flex items-center justify-between"
               >
                 <div className="flex items-center gap-3">
                   <img
@@ -245,11 +245,11 @@ export const GroupDetailView: React.FC<GroupDetailViewProps> = ({ group }) => {
                       'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
                     }
                     alt={m.memberName}
-                    className="w-9 h-9 rounded-full object-cover ring-1 ring-slate-700"
+                    className="w-9 h-9 rounded-md object-cover border border-outline/30"
                   />
                   <div>
-                    <p className="text-xs font-bold text-slate-200">{m.memberName}</p>
-                    <p className="text-[10px] text-slate-400">
+                    <p className="text-xs font-bold text-on-surface">{m.memberName}</p>
+                    <p className="text-[10px] text-on-surface-variant font-medium">
                       Paid {formatCurrency(toMajorUnits(balInfo.totalPaid), currency)}
                     </p>
                   </div>
@@ -259,10 +259,10 @@ export const GroupDetailView: React.FC<GroupDetailViewProps> = ({ group }) => {
                   <p
                     className={`text-xs font-bold ${
                       netMajor > 0
-                        ? 'text-emerald-400'
+                        ? 'text-primary'
                         : netMajor < 0
-                        ? 'text-rose-400'
-                        : 'text-slate-400'
+                        ? 'text-error'
+                        : 'text-on-surface-variant'
                     }`}
                   >
                     {netMajor > 0
@@ -280,14 +280,14 @@ export const GroupDetailView: React.FC<GroupDetailViewProps> = ({ group }) => {
 
       {/* Expenses History List */}
       <div>
-        <h3 className="text-base font-bold text-slate-100 mb-3">Group Expenses ({expenses.length})</h3>
+        <h3 className="text-base font-bold text-on-surface mb-3">Group Expenses ({expenses.length})</h3>
 
         {expenses.length === 0 ? (
-          <div className="p-8 text-center bg-slate-900/40 rounded-2xl border border-slate-800">
-            <p className="text-sm font-medium text-slate-400">No expenses recorded in this group yet</p>
+          <div className="p-8 text-center bg-surface-container rounded-lg border border-outline/20">
+            <p className="text-sm font-medium text-on-surface-variant">No expenses recorded in this group yet</p>
             <button
               onClick={() => dispatch(openAddExpenseSheet())}
-              className="mt-3 text-xs font-semibold px-4 py-2 rounded-xl bg-indigo-600 text-white"
+              className="mt-3 text-xs font-bold px-4 py-2 rounded-md bg-primary text-on-primary hover:bg-surface-variant hover:text-on-surface border border-outline/30 transition-all"
             >
               + Add first expense
             </button>

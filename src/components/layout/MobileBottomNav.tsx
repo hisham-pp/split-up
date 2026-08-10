@@ -42,7 +42,7 @@ export const MobileBottomNav: React.FC = () => {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-slate-950/95 backdrop-blur-2xl border-t border-slate-800/80 safe-nav-bottom transition-all duration-200"
+      className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-surface-container border-t border-outline/30 safe-nav-bottom transition-all duration-200"
       aria-label="Mobile Navigation"
     >
       <div className="grid grid-cols-4 items-center h-16 max-w-md mx-auto px-2">
@@ -54,12 +54,12 @@ export const MobileBottomNav: React.FC = () => {
             <button
               key={item.id}
               onClick={() => handleTabClick(item.id)}
-              className={`relative flex flex-col items-center justify-center h-full py-1 rounded-2xl transition-all duration-200 active:scale-95 ${
-                isActive ? 'text-indigo-400 font-semibold' : 'text-slate-400 hover:text-slate-200'
+              className={`relative flex flex-col items-center justify-center h-full py-1 rounded-md transition-all duration-200 active:scale-95 ${
+                isActive ? 'text-primary font-semibold' : 'text-on-surface-variant hover:text-on-surface'
               }`}
             >
               {isActive && (
-                <span className="absolute inset-x-2 inset-y-1 bg-indigo-500/15 rounded-xl border border-indigo-500/20 -z-10 animate-fade-in" />
+                <span className="absolute inset-x-2 inset-y-1 bg-surface-variant rounded-md border border-outline/20 -z-10 animate-fade-in" />
               )}
               <div className={`p-1 transition-transform duration-200 ${isActive ? '-translate-y-0.5 scale-110' : ''}`}>
                 <Icon className="w-5 h-5 stroke-[2]" />

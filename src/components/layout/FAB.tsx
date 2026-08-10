@@ -20,10 +20,10 @@ export const FAB: React.FC = () => {
     <div className="fixed bottom-[72px] right-4 z-40 lg:bottom-8 lg:right-8 safe-nav-bottom transition-all duration-200">
       <button
         onClick={handleClick}
-        className="group relative flex items-center justify-center gap-2 h-14 px-4 sm:px-5 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold shadow-xl shadow-indigo-600/30 border border-indigo-400/30 active:scale-90 transition-all duration-200"
+        className="group relative flex items-center justify-center gap-2 h-14 px-4 sm:px-5 rounded-md bg-primary hover:bg-surface-variant text-on-primary hover:text-on-surface font-bold border border-outline/30 active:scale-90 transition-all duration-200"
         aria-label="Add Expense"
       >
-        <span className="absolute inset-0 rounded-full bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+        <span className="absolute inset-0 rounded-md bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
         <Plus className="w-6 h-6 stroke-[2.5] transition-transform group-hover:rotate-90 duration-300" />
         <span className="hidden sm:inline-block text-sm tracking-wide">
           Expense

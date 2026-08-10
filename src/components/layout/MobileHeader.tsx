@@ -18,13 +18,13 @@ export const MobileHeader: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-30 w-full backdrop-blur-xl bg-slate-950/80 border-b border-slate-800/80 safe-pt px-4 py-3">
+    <header className="sticky top-0 z-30 w-full bg-surface/95 border-b border-outline/30 safe-pt px-4 py-3">
       <div className="flex items-center justify-between max-w-5xl mx-auto">
         {activeGroup ? (
           <div className="flex items-center gap-3">
             <button
               onClick={handleBack}
-              className="p-2 -ml-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 active:scale-95 transition-all"
+              className="p-2 -ml-2 rounded-md text-on-surface-variant hover:text-on-surface hover:bg-surface-variant active:scale-95 transition-all"
               aria-label="Back"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -36,13 +36,13 @@ export const MobileHeader: React.FC = () => {
                   'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=600&q=80'
                 }
                 alt={activeGroup.name || 'Group'}
-                className="w-8 h-8 rounded-lg object-cover ring-1 ring-slate-700"
+                className="w-8 h-8 rounded-md object-cover border border-outline/30"
               />
               <div>
-                <h1 className="font-bold text-slate-100 text-base leading-tight">
+                <h1 className="font-bold text-on-surface text-base leading-tight">
                   {activeGroup.name}
                 </h1>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-on-surface-variant font-medium">
                   {Array.isArray(activeGroup?.members)
                     ? `${activeGroup.members.length} members`
                     : activeGroup?.category || 'Group'}
@@ -52,14 +52,14 @@ export const MobileHeader: React.FC = () => {
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-              <Sparkles className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 rounded-md bg-surface-variant flex items-center justify-center border border-outline/30">
+              <Sparkles className="w-4 h-4 text-primary" />
             </div>
             <div>
-              <span className="font-extrabold text-lg text-white tracking-tight">
+              <span className="font-extrabold text-lg text-on-surface tracking-tight">
                 SplitUp
               </span>
-              <span className="hidden sm:inline-block ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+              <span className="hidden sm:inline-block ml-2 text-xs font-semibold px-2 py-0.5 rounded-sm bg-surface-variant text-on-surface-variant border border-outline/20">
                 {activeTab.toUpperCase()}
               </span>
             </div>
@@ -71,7 +71,7 @@ export const MobileHeader: React.FC = () => {
 
           {activeGroup && (
             <button
-              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all"
+              className="p-2 rounded-md text-on-surface-variant hover:text-on-surface hover:bg-surface-variant transition-all"
               aria-label="Options"
             >
               <MoreVertical className="w-5 h-5" />

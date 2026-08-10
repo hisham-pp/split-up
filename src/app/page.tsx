@@ -38,7 +38,7 @@ export default function MainPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-slate-950 text-slate-100 font-sans antialiased">
+    <div className="flex min-h-screen bg-background text-on-background font-sans antialiased">
       {/* Desktop Navigation Sidebar (>1024px) */}
       <DesktopSidebar />
 
