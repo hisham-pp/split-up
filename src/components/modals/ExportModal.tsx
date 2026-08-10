@@ -1,10 +1,11 @@
 'use client';
 
 import React from 'react';
+import { Modal } from '@/components/ui/Modal';
 import { LocalGroup, LocalGroupMember, LocalExpense, LocalSettlement } from '@/lib/db/db';
 import { formatCurrency } from '@/utils/formatters';
 import { toMajorUnits } from '@/lib/financial/financialEngine';
-import { X, Download, FileSpreadsheet, FileText } from 'lucide-react';
+import { Download, FileSpreadsheet, FileText } from 'lucide-react';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -181,49 +182,42 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in">
-      <div className="relative w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl overflow-hidden">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-200 rounded-full hover:bg-slate-800 transition-colors"
-        >
-          <X className="w-5 h-5" />
-        </button>
-
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <div className="p-6">
         <div className="text-center mb-6">
-          <div className="w-12 h-12 bg-indigo-600/20 text-indigo-400 rounded-2xl flex items-center justify-center mx-auto mb-3">
+          <div className="w-12 h-12 bg-secondary-container text-on-secondary-container rounded-2xl flex items-center justify-center mx-auto mb-3">
             <Download className="w-6 h-6" />
           </div>
-          <h2 className="text-xl font-bold text-slate-100">Export Group Data</h2>
-          <p className="text-xs text-slate-400 mt-1">
-            Export expenses and net balance summary for <span className="text-indigo-300 font-semibold">{group.name}</span>
+          <h2 className="text-[22px] font-medium text-on-surface">Export Group Data</h2>
+          <p className="text-sm text-on-surface-variant mt-1">
+            Export expenses and balance summary for <span className="text-primary font-semibold">{group.name}</span>
           </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <button
             onClick={handleExportCSV}
-            className="p-5 rounded-2xl bg-slate-950 border border-slate-800 hover:border-indigo-500/50 hover:bg-slate-800/80 transition-all flex flex-col items-center text-center gap-2 group"
+            className="p-5 rounded-2xl bg-surface-container border border-outline/10 hover:border-primary/30 hover:bg-surface-container-high transition-all flex flex-col items-center text-center gap-2 group"
           >
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <div className="w-10 h-10 rounded-xl bg-tertiary-container text-on-tertiary-container flex items-center justify-center group-hover:scale-110 transition-transform">
               <FileSpreadsheet className="w-5 h-5" />
             </div>
-            <span className="font-bold text-slate-100 text-sm">Export CSV</span>
-            <span className="text-[11px] text-slate-400">Raw spreadsheet format</span>
+            <span className="font-semibold text-on-surface text-sm">Export CSV</span>
+            <span className="text-[11px] text-on-surface-variant">Raw spreadsheet format</span>
           </button>
 
           <button
             onClick={handleExportPDF}
-            className="p-5 rounded-2xl bg-slate-950 border border-slate-800 hover:border-indigo-500/50 hover:bg-slate-800/80 transition-all flex flex-col items-center text-center gap-2 group"
+            className="p-5 rounded-2xl bg-surface-container border border-outline/10 hover:border-primary/30 hover:bg-surface-container-high transition-all flex flex-col items-center text-center gap-2 group"
           >
-            <div className="w-10 h-10 rounded-xl bg-rose-500/15 text-rose-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <div className="w-10 h-10 rounded-xl bg-error-container text-on-error-container flex items-center justify-center group-hover:scale-110 transition-transform">
               <FileText className="w-5 h-5" />
             </div>
-            <span className="font-bold text-slate-100 text-sm">Printable PDF</span>
-            <span className="text-[11px] text-slate-400">Formatted summary sheet</span>
+            <span className="font-semibold text-on-surface text-sm">Printable PDF</span>
+            <span className="text-[11px] text-on-surface-variant">Formatted summary sheet</span>
           </button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 };

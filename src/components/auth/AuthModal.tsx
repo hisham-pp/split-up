@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { Modal } from '@/components/ui/Modal';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store/store';
 import { closeAuthModal, setUser, setAuthError } from '@/store/slices/authSlice';
@@ -144,14 +145,8 @@ export const AuthModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/95 backdrop-blur-md animate-fade-in">
-      <div className="relative w-full max-w-md bg-surface border border-outline/30 rounded-lg p-6 overflow-hidden max-h-[90vh] overflow-y-auto">
-        <button
-          onClick={() => dispatch(closeAuthModal())}
-          className="absolute top-4 right-4 p-2 text-on-surface-variant hover:text-on-surface rounded-md hover:bg-surface-variant transition-colors"
-        >
-          <X className="w-5 h-5" />
-        </button>
+    <Modal isOpen={authModalOpen} onClose={() => dispatch(closeAuthModal())} fullHeight>
+      <div className="p-6">
 
         <div className="text-center mb-6">
           <div className="w-12 h-12 bg-surface-variant text-on-surface border border-outline/30 rounded-md flex items-center justify-center mx-auto mb-3">
@@ -298,6 +293,6 @@ export const AuthModal: React.FC = () => {
           </button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 };

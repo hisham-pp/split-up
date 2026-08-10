@@ -7,6 +7,7 @@ import { setCurrency } from '@/store/slices/uiSlice';
 import { openAuthModal, logout } from '@/store/slices/authSlice';
 import { subscribeSyncStatus, processSyncQueue, SyncStatus } from '@/lib/sync/syncEngine';
 import { isSupabaseConfigured } from '@/lib/supabase/supabase';
+import { Modal } from '@/components/ui/Modal';
 import { supabase } from '@/lib/supabase/supabase';
 import { db } from '@/lib/db/db';
 import { toValidUuid } from '@/lib/sync/syncEngine';
@@ -273,9 +274,8 @@ export const ProfileView: React.FC = () => {
       )}
 
       {/* Clear Data Confirmation Modal */}
-      {showClearModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-md bg-surface-container-lowest rounded-[28px] p-6 shadow-xl">
+      <Modal isOpen={showClearModal} onClose={clearStep !== 'clearing' ? () => setShowClearModal(false) : undefined} hideCloseButton={clearStep === 'clearing'}>
+          <div className="p-6">
             {clearStep === 'confirm' && (
               <>
                 <div className="flex items-center gap-3 mb-4">
@@ -360,8 +360,7 @@ export const ProfileView: React.FC = () => {
               </div>
             )}
           </div>
-        </div>
-      )}
+      </Modal>
     </div>
   );
 };

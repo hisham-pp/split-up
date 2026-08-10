@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { Modal } from '@/components/ui/Modal';
 import { db, LocalGroup, LocalGroupMember } from '@/lib/db/db';
 import { queueMutation } from '@/lib/sync/syncEngine';
-import { X, Plus, Trash2, Users, Image as ImageIcon, Sparkles, ChevronDown } from 'lucide-react';
+import { Plus, Trash2, Users, Image as ImageIcon, Sparkles, ChevronDown } from 'lucide-react';
 
 interface GroupModalProps {
   isOpen: boolean;
@@ -120,15 +121,8 @@ export const GroupModal: React.FC<GroupModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-full max-w-lg bg-surface-container-lowest border border-outline-variant/20 rounded-[28px] p-6 shadow-xl overflow-hidden max-h-[90vh] overflow-y-auto">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center text-on-surface hover:bg-surface-container-highest rounded-full transition-colors"
-        >
-          <X className="w-5 h-5" />
-        </button>
-
+    <Modal isOpen={isOpen} onClose={onClose} maxWidth="max-w-lg" fullHeight>
+      <div className="p-6">
         <div className="mb-6 mt-2">
           <h2 className="text-[22px] font-medium text-on-surface flex items-center gap-2">
             <Sparkles className="w-6 h-6 text-primary" />
@@ -282,6 +276,6 @@ export const GroupModal: React.FC<GroupModalProps> = ({
           </div>
         </form>
       </div>
-    </div>
+    </Modal>
   );
 };
