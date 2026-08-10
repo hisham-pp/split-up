@@ -37,7 +37,7 @@ export const GroupModal: React.FC<GroupModalProps> = ({
       setName('');
       setCategory('Travel');
       setCoverImage('https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=600&q=80');
-      setMemberInputs(['Alex', 'John', 'Sarah']);
+      setMemberInputs([]);
     }
   }, [groupToEdit, isOpen]);
 
