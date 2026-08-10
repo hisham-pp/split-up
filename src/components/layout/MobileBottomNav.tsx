@@ -1,16 +1,25 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '@/store/store';
-import { setActiveTab, setActiveGroup, NavTab } from '@/store/slices/uiSlice';
+import { usePathname, useRouter } from 'next/navigation';
+import { NavTab } from '@/store/slices/uiSlice';
 import { Home, Users, Activity, User } from 'lucide-react';
 import { triggerHaptic } from '@/utils/haptics';
 
 export const MobileBottomNav: React.FC = () => {
-  const dispatch = useDispatch();
-  const activeTab = useSelector((state: RootState) => state.ui.activeTab);
+  const router = useRouter();
+  const pathname = usePathname();
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+
+  // Determine active tab based on pathname
+  let activeTab: NavTab = 'home';
+  if (pathname === '/groups' || pathname?.startsWith('/groups/')) {
+    activeTab = 'groups';
+  } else if (pathname === '/activity') {
+    activeTab = 'activity';
+  } else if (pathname === '/profile') {
+    activeTab = 'profile';
+  }
 
   useEffect(() => {
     // Soft keyboard detection
@@ -36,8 +45,11 @@ export const MobileBottomNav: React.FC = () => {
 
   const handleTabClick = (tabId: NavTab) => {
     triggerHaptic(12);
-    dispatch(setActiveTab(tabId));
-    dispatch(setActiveGroup(null));
+    if (tabId === 'home') {
+      router.push('/');
+    } else {
+      router.push(`/${tabId}`);
+    }
   };
 
   return (

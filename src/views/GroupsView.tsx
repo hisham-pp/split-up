@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store/store';
+import { useRouter } from 'next/navigation';
 import { setActiveGroup } from '@/store/slices/uiSlice';
 import { db, LocalGroup } from '@/lib/db/db';
 import { computeGroupBalances, toMajorUnits } from '@/lib/financial/financialEngine';
@@ -13,6 +14,7 @@ import { Plus, Search, Users, ChevronRight, Layers } from 'lucide-react';
 
 export const GroupsView: React.FC = () => {
   const dispatch = useDispatch();
+  const router = useRouter();
   const currency = useSelector((state: RootState) => state.ui.currency);
   const currentUser = useSelector((state: RootState) => state.auth.user);
 
@@ -156,7 +158,7 @@ export const GroupsView: React.FC = () => {
                 key={group.id}
                 onClick={() => {
                   triggerHaptic(10);
-                  dispatch(setActiveGroup(group as any));
+                  router.push(`/groups/${group.id}`);
                 }}
                 className="group relative overflow-hidden rounded-2xl bg-surface-container-low hover:bg-surface-container transition-all cursor-pointer active:scale-95 p-4"
               >

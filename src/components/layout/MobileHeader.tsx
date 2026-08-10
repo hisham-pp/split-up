@@ -3,18 +3,20 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store/store';
+import { usePathname, useRouter } from 'next/navigation';
 import { setActiveGroup } from '@/store/slices/uiSlice';
 import { OfflineBanner } from '../ui/OfflineBanner';
 import { ArrowLeft, MoreVertical, Sparkles } from 'lucide-react';
 import { triggerHaptic } from '@/utils/haptics';
 
 export const MobileHeader: React.FC = () => {
-  const dispatch = useDispatch();
+  const router = useRouter();
+  const pathname = usePathname();
   const { activeGroup, activeTab } = useSelector((state: RootState) => state.ui);
 
   const handleBack = () => {
     triggerHaptic(10);
-    dispatch(setActiveGroup(null));
+    router.push('/groups');
   };
 
   return (

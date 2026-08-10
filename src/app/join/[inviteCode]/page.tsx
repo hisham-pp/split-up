@@ -140,8 +140,7 @@ export default function JoinGroupPage({ params }: { params: Promise<{ inviteCode
         await queueMutation('ADD_MEMBER', newMember);
       }
 
-      dispatch(setActiveGroup(group as any));
-      router.push('/');
+      router.push(`/groups/${group.id}`);
     } catch (err) {
       setError('Failed to join the group.');
     } finally {

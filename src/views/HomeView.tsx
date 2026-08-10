@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store/store';
+import { useRouter } from 'next/navigation';
 import { setActiveTab, setActiveGroup, openAddExpenseSheet } from '@/store/slices/uiSlice';
 import { db, LocalGroup, LocalExpense, LocalGroupMember } from '@/lib/db/db';
 import { processSyncQueue } from '@/lib/sync/syncEngine';
@@ -22,6 +23,7 @@ import {
 
 export const HomeView: React.FC = () => {
   const dispatch = useDispatch();
+  const router = useRouter();
   const currency = useSelector((state: RootState) => state.ui.currency);
   const currentUser = useSelector((state: RootState) => state.auth.user);
 
@@ -179,7 +181,7 @@ export const HomeView: React.FC = () => {
                   key={group.id}
                   onClick={() => {
                     triggerHaptic(10);
-                    dispatch(setActiveGroup(group as any));
+                    router.push(`/groups/${group.id}`);
                   }}
                   className="flex items-center gap-3 p-3 min-w-[200px] rounded-lg bg-surface-container hover:bg-surface-variant border border-outline/20 shrink-0 text-left transition-all active:scale-95"
                 >

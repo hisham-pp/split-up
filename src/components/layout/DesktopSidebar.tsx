@@ -3,14 +3,25 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store/store';
-import { setActiveTab, setActiveGroup, openAddExpenseSheet, NavTab } from '@/store/slices/uiSlice';
+import { openAddExpenseSheet, NavTab } from '@/store/slices/uiSlice';
 import { openAuthModal, logout } from '@/store/slices/authSlice';
 import { Home, Users, Activity, User, Plus, Sparkles, LogIn, LogOut } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
 
 export const DesktopSidebar: React.FC = () => {
   const dispatch = useDispatch();
-  const { activeTab } = useSelector((state: RootState) => state.ui);
+  const router = useRouter();
+  const pathname = usePathname();
   const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
+
+  let activeTab: NavTab = 'home';
+  if (pathname === '/groups' || pathname?.startsWith('/groups/')) {
+    activeTab = 'groups';
+  } else if (pathname === '/activity') {
+    activeTab = 'activity';
+  } else if (pathname === '/profile') {
+    activeTab = 'profile';
+  }
 
   const navItems: { id: NavTab; label: string; icon: React.FC<{ className?: string }> }[] = [
     { id: 'home', label: 'Dashboard', icon: Home },
@@ -20,8 +31,11 @@ export const DesktopSidebar: React.FC = () => {
   ];
 
   const handleNav = (tabId: NavTab) => {
-    dispatch(setActiveTab(tabId));
-    dispatch(setActiveGroup(null));
+    if (tabId === 'home') {
+      router.push('/');
+    } else {
+      router.push(`/${tabId}`);
+    }
   };
 
   return (
