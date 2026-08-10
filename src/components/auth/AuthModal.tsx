@@ -139,6 +139,7 @@ export const AuthModal: React.FC = () => {
                 <User className="absolute left-3.5 top-3 w-4 h-4 text-slate-500" />
                 <input
                   type="text"
+                  suppressHydrationWarning
                   required
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
@@ -157,6 +158,7 @@ export const AuthModal: React.FC = () => {
               <Mail className="absolute left-3.5 top-3 w-4 h-4 text-slate-500" />
               <input
                 type="email"
+                suppressHydrationWarning
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -174,6 +176,7 @@ export const AuthModal: React.FC = () => {
               <Lock className="absolute left-3.5 top-3 w-4 h-4 text-slate-500" />
               <input
                 type="password"
+                suppressHydrationWarning
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

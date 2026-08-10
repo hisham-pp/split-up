@@ -225,6 +225,7 @@ export const HomeView: React.FC = () => {
             <Search className="absolute left-3.5 top-3 w-4 h-4 text-slate-500" />
             <input
               type="text"
+              suppressHydrationWarning
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search expenses by title or category..."
