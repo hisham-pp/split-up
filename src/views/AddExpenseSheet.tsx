@@ -19,6 +19,7 @@ import {
   AlertCircle,
   FileText,
   PieChart,
+  ChevronDown,
 } from 'lucide-react';
 
 export const AddExpenseSheet: React.FC = () => {
@@ -271,18 +272,40 @@ export const AddExpenseSheet: React.FC = () => {
               
               <div className="flex gap-4">
                 <div className="relative flex-1 bg-surface-container-highest rounded-t-lg border-b border-on-surface-variant flex items-center focus-within:border-primary focus-within:border-b-2 transition-all">
+                  <Tag className="absolute left-4 w-5 h-5 text-on-surface-variant z-10 pointer-events-none" />
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value as any)}
+                    className="w-full bg-transparent border-none pl-12 pr-10 py-4 text-base text-on-surface cursor-pointer focus:outline-none focus:ring-0 appearance-none"
+                  >
+                    <option value="Food">Food & Drinks</option>
+                    <option value="Travel">Travel & Transport</option>
+                    <option value="Housing">Accommodation</option>
+                    <option value="Entertainment">Entertainment</option>
+                    <option value="Shopping">Shopping</option>
+                    <option value="Utilities">Utilities</option>
+                    <option value="Other">Other</option>
+                  </select>
+                  <ChevronDown className="absolute right-4 w-5 h-5 text-on-surface-variant z-10 pointer-events-none" />
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <div className="relative flex-1 bg-surface-container-highest rounded-t-lg border-b border-on-surface-variant flex items-center focus-within:border-primary focus-within:border-b-2 transition-all">
                   <Users className="absolute left-4 w-5 h-5 text-on-surface-variant z-10 pointer-events-none" />
                   <select
                     value={selectedGroupId}
                     onChange={(e) => setSelectedGroupId(e.target.value)}
-                    className="w-full bg-transparent border-none pl-12 pr-4 py-4 text-base text-on-surface cursor-pointer focus:outline-none focus:ring-0 appearance-none"
+                    className="w-full bg-transparent border-none pl-12 pr-10 py-4 text-base text-on-surface cursor-pointer focus:outline-none focus:ring-0 appearance-none"
                   >
+                    {groups.length === 0 && <option value="">No Groups Found</option>}
                     {groups.map((g) => (
                       <option key={g.id} value={g.id}>
                         {g.name}
                       </option>
                     ))}
                   </select>
+                  <ChevronDown className="absolute right-4 w-5 h-5 text-on-surface-variant z-10 pointer-events-none" />
                 </div>
                 <div className="h-[56px] w-[56px] bg-surface-container-highest rounded-lg flex items-center justify-center border-b border-on-surface-variant shrink-0 cursor-not-allowed">
                   <Calendar className="w-6 h-6 text-on-surface-variant" />
@@ -313,19 +336,23 @@ export const AddExpenseSheet: React.FC = () => {
 
             {/* Who Paid / Split among */}
             <div className="bg-surface-container-low rounded-xl p-4 flex flex-col gap-4">
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center relative">
                 <span className="text-sm text-on-surface-variant">Paid by</span>
-                <select
-                  className="bg-surface-container-highest px-4 py-1.5 rounded-full text-sm font-medium text-on-surface hover:bg-surface-container transition-colors outline-none cursor-pointer border-none"
-                  value={selectedPayerId}
-                  onChange={(e) => setSelectedPayerId(e.target.value)}
-                >
-                  {members.map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.memberName}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative flex items-center">
+                  <select
+                    className="bg-surface-container-highest pl-4 pr-8 py-1.5 rounded-full text-sm font-medium text-on-surface hover:bg-surface-container transition-colors outline-none cursor-pointer border-none appearance-none"
+                    value={selectedPayerId}
+                    onChange={(e) => setSelectedPayerId(e.target.value)}
+                  >
+                    {members.length === 0 && <option value="">No one</option>}
+                    {members.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.memberName}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-2 w-4 h-4 text-on-surface pointer-events-none" />
+                </div>
               </div>
               
               <hr className="border-outline-variant/30" />
