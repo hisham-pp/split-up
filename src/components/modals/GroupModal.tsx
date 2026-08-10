@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { db, LocalGroup, LocalGroupMember } from '@/lib/db/db';
 import { queueMutation } from '@/lib/sync/syncEngine';
-import { X, Plus, Trash2, Users, Image as ImageIcon, Sparkles } from 'lucide-react';
+import { X, Plus, Trash2, Users, Image as ImageIcon, Sparkles, ChevronDown } from 'lucide-react';
 
 interface GroupModalProps {
   isOpen: boolean;
@@ -120,79 +120,107 @@ export const GroupModal: React.FC<GroupModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in">
-      <div className="relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
+      <div className="relative w-full max-w-lg bg-surface-container-lowest border border-outline-variant/20 rounded-[28px] p-6 shadow-xl overflow-hidden max-h-[90vh] overflow-y-auto">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-200 rounded-full hover:bg-slate-800 transition-colors"
+          className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center text-on-surface hover:bg-surface-container-highest rounded-full transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
 
-        <div className="mb-5">
-          <h2 className="text-xl font-bold text-slate-100 flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-indigo-400" />
+        <div className="mb-6 mt-2">
+          <h2 className="text-[22px] font-medium text-on-surface flex items-center gap-2">
+            <Sparkles className="w-6 h-6 text-primary" />
             <span>{groupToEdit ? 'Edit Group' : 'Create New Group'}</span>
           </h2>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-sm text-on-surface-variant mt-2 pr-6">
             Setup a group to share expenses with friends, family, or housemates
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
-              Group Name *
-            </label>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="relative bg-surface-container-highest rounded-t-lg border-b border-on-surface-variant focus-within:border-primary focus-within:border-b-2 transition-all">
             <input
               type="text"
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Goa Trip 2026"
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500"
+              placeholder=" "
+              className="peer w-full bg-transparent border-none px-4 pt-6 pb-2 text-base text-on-surface focus:outline-none focus:ring-0 placeholder-transparent"
             />
+            <label className="absolute left-4 top-4 text-on-surface-variant transition-all peer-focus:-translate-y-2 peer-focus:scale-75 peer-focus:text-primary peer-[:not(:placeholder-shown)]:-translate-y-2 peer-[:not(:placeholder-shown)]:scale-75 origin-top-left pointer-events-none font-medium">
+              Group Name *
+            </label>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
+              <label className="block text-xs font-bold text-on-surface mb-1">
                 Category
               </label>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500"
-              >
-                <option value="Travel font-sans">Travel</option>
-                <option value="Housing">Housing</option>
-                <option value="Food">Food & Dining</option>
-                <option value="Entertainment">Entertainment</option>
-                <option value="Utilities">Utilities</option>
-                <option value="Other">Other</option>
-              </select>
+              <div className="relative flex items-center bg-surface-container-highest rounded-md border-b border-on-surface-variant focus-within:border-primary focus-within:border-b-2 transition-all">
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full bg-transparent border-none pl-3 pr-10 py-3 text-sm text-on-surface cursor-pointer focus:outline-none focus:ring-0 appearance-none"
+                >
+                  <option value="Travel">Travel</option>
+                  <option value="Housing">Housing</option>
+                  <option value="Food">Food & Dining</option>
+                  <option value="Entertainment">Entertainment</option>
+                  <option value="Utilities">Utilities</option>
+                  <option value="Other">Other</option>
+                </select>
+                <ChevronDown className="absolute right-3 w-4 h-4 text-on-surface-variant pointer-events-none" />
+              </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
+              <label className="block text-xs font-bold text-on-surface mb-1">
                 Cover Image URL
               </label>
-              <div className="relative">
-                <ImageIcon className="absolute left-3 top-3 w-4 h-4 text-slate-500" />
+              <div className="relative flex items-center bg-surface-container-highest rounded-md border-b border-on-surface-variant focus-within:border-primary focus-within:border-b-2 transition-all">
+                <ImageIcon className="absolute left-3 w-4 h-4 text-on-surface-variant" />
                 <input
                   type="url"
                   value={coverImage}
                   onChange={(e) => setCoverImage(e.target.value)}
                   placeholder="https://..."
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-transparent border-none pl-9 pr-3 py-3 text-sm text-on-surface focus:outline-none focus:ring-0"
                 />
               </div>
             </div>
           </div>
 
+          <div>
+            <label className="block text-xs font-bold text-on-surface mb-2">
+              Preset Banners
+            </label>
+            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+              {[
+                'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80',
+                'https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=600&q=80',
+                'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80',
+                'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=600&q=80',
+                'https://images.unsplash.com/photo-1557672172-298e090bd0f1?auto=format&fit=crop&w=600&q=80'
+              ].map((url, idx) => (
+                <img
+                  key={idx}
+                  src={url}
+                  alt={`Preset ${idx + 1}`}
+                  onClick={() => setCoverImage(url)}
+                  className={`w-16 h-12 rounded-lg object-cover cursor-pointer border-2 transition-all shrink-0 ${
+                    coverImage === url ? 'border-primary scale-105 shadow-md' : 'border-transparent hover:scale-105 opacity-80 hover:opacity-100'
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+
           {!groupToEdit && (
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <div className="pt-2">
+              <label className="block text-sm font-medium text-on-surface mb-2">
                 Add Group Members
               </label>
               <div className="flex gap-2 mb-3">
@@ -207,12 +235,12 @@ export const GroupModal: React.FC<GroupModalProps> = ({
                     }
                   }}
                   placeholder="Enter member name (e.g. Sarah)"
-                  className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-indigo-500"
+                  className="flex-1 bg-surface-container-highest border-none rounded-full px-4 py-3 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20"
                 />
                 <button
                   type="button"
                   onClick={handleAddMemberInput}
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold flex items-center gap-1 shrink-0"
+                  className="px-5 py-3 bg-primary-container text-on-primary-container hover:bg-primary-container/80 rounded-full text-sm font-medium flex items-center gap-1 shrink-0 transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Add</span>
@@ -220,20 +248,20 @@ export const GroupModal: React.FC<GroupModalProps> = ({
               </div>
 
               <div className="flex flex-wrap gap-2">
-                <div className="px-3 py-1.5 rounded-xl bg-indigo-600/20 border border-indigo-500/40 text-indigo-300 text-xs font-semibold flex items-center gap-1">
+                <div className="px-3 py-1.5 rounded-full bg-surface-variant text-on-surface-variant text-xs font-medium flex items-center gap-1.5 border border-outline/20">
                   <Users className="w-3.5 h-3.5" />
                   <span>You (Owner)</span>
                 </div>
                 {memberInputs.map((mName, idx) => (
                   <div
                     key={idx}
-                    className="px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-200 text-xs font-medium flex items-center gap-2"
+                    className="px-3 py-1.5 rounded-full bg-surface text-on-surface text-xs font-medium flex items-center gap-2 border border-outline/30"
                   >
                     <span>{mName}</span>
                     <button
                       type="button"
                       onClick={() => handleRemoveMemberInput(idx)}
-                      className="text-slate-400 hover:text-rose-400"
+                      className="text-on-surface-variant hover:text-error transition-colors"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -243,13 +271,15 @@ export const GroupModal: React.FC<GroupModalProps> = ({
             </div>
           )}
 
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full py-3 mt-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm shadow-lg shadow-indigo-600/30 transition-all active:scale-95"
-          >
-            {groupToEdit ? 'Save Changes' : 'Create Group'}
-          </button>
+          <div className="pt-4">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full h-14 rounded-full bg-primary text-on-primary font-medium text-sm transition-all hover:bg-primary/90 active:scale-[0.98] shadow-sm flex items-center justify-center"
+            >
+              {groupToEdit ? 'Save Changes' : 'Create Group'}
+            </button>
+          </div>
         </form>
       </div>
     </div>
