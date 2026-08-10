@@ -102,26 +102,37 @@ export default function JoinGroupPage({ params }: { params: Promise<{ inviteCode
 
   const handleJoin = async () => {
     if (!isAuthenticated) {
-      // Force them to open Auth Modal by doing some action or just wait?
-      // Actually we just show the auth modal if not authenticated
       return;
     }
 
-    if (!group) return;
+    if (!group || !user?.id) return;
 
     setJoining(true);
     try {
-      // Check if already a member
-      const existingMember = await db.groupMembers.where({ groupId: group.id, userId: user?.id }).first();
-      
-      if (!existingMember) {
+      // Load all current members for this group
+      const allMembers = await db.groupMembers.where('groupId').equals(group.id).toArray();
+
+      // Check if this user is already a real member (by userId)
+      const alreadyMember = allMembers.some((m) => m.userId === user.id);
+
+      if (!alreadyMember) {
+        // Remove any ghost placeholder members with no userId that have the same name
+        // (e.g. pre-added name-only placeholders that the real user would replace)
+        const ghosts = allMembers.filter(
+          (m) => !m.userId && m.memberName === (user.fullName || 'New Member')
+        );
+        for (const ghost of ghosts) {
+          await db.groupMembers.delete(ghost.id);
+        }
+
         const now = new Date().toISOString();
         const newMember: LocalGroupMember = {
           id: `mb_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
           groupId: group.id,
-          userId: user?.id,
-          memberName: user?.fullName || 'New Member',
-          memberAvatar: user?.avatarUrl,
+          userId: user.id,
+          memberName: user.fullName || 'New Member',
+          memberEmail: user.email,
+          memberAvatar: user.avatarUrl,
           role: 'member',
           joinedAt: now,
         };
