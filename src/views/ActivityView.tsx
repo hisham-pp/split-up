@@ -82,41 +82,41 @@ export const ActivityView: React.FC = () => {
       </div>
 
       {activities.length === 0 ? (
-        <div className="p-8 text-center bg-surface-container rounded-md border border-outline/20">
+        <div className="p-8 text-center">
           <Activity className="w-8 h-8 text-on-surface-variant mx-auto mb-2" />
           <p className="text-sm font-medium text-on-surface-variant">No activity recorded yet</p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="bg-surface-container-low rounded-2xl flex flex-col overflow-hidden p-2 gap-2">
           {activities.map((act) => (
             <div
               key={act.id}
-              className="p-4 rounded-md bg-surface-container border border-outline/20 flex items-center justify-between"
+              className="p-4 rounded-xl bg-surface-container hover:bg-surface-container-high transition-colors flex items-center justify-between"
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
                 <div
-                  className={`w-10 h-10 rounded-md flex items-center justify-center shrink-0 border ${
+                  className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${
                     act.type === 'expense_added'
-                      ? 'bg-primary text-on-primary border-primary'
+                      ? 'bg-primary-container text-on-primary-container'
                       : act.type === 'settlement'
-                      ? 'bg-surface-variant text-on-surface border-outline/30'
-                      : 'bg-error text-on-error border-error/50'
+                      ? 'bg-secondary-container text-on-secondary-container'
+                      : 'bg-error-container text-on-error-container'
                   }`}
                 >
-                  {act.type === 'expense_added' && <CreditCard className="w-5 h-5" />}
-                  {act.type === 'settlement' && <CheckCircle2 className="w-5 h-5" />}
-                  {act.type === 'expense_deleted' && <Trash2 className="w-5 h-5" />}
+                  {act.type === 'expense_added' && <CreditCard className="w-6 h-6" />}
+                  {act.type === 'settlement' && <CheckCircle2 className="w-6 h-6" />}
+                  {act.type === 'expense_deleted' && <Trash2 className="w-6 h-6" />}
                 </div>
 
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-on-surface">{act.title}</span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-sm bg-surface-variant text-on-surface-variant border border-outline/20">
+                    <span className="text-base font-semibold text-on-surface">{act.title}</span>
+                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-surface-variant text-on-surface-variant">
                       {act.groupName}
                     </span>
                   </div>
-                  <p className="text-xs text-on-surface-variant mt-0.5">{act.description}</p>
-                  <p className="text-[10px] text-on-surface-variant mt-0.5 font-medium">
+                  <p className="text-sm text-on-surface-variant mt-0.5">{act.description}</p>
+                  <p className="text-xs text-on-surface-variant mt-0.5 font-medium opacity-80">
                     {new Date(act.date).toLocaleString()}
                   </p>
                 </div>
