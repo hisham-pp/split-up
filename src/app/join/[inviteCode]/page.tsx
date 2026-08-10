@@ -94,6 +94,16 @@ export default function JoinGroupPage({ params }: { params: Promise<{ inviteCode
             updatedAt: new Date().toISOString(),
           };
           await db.groups.put(foundGroup);
+
+          // Seed default creator member if empty
+          const defaultCreator: LocalGroupMember = {
+            id: `mb_${Date.now()}_creator`,
+            groupId: groupId,
+            memberName: 'Group Host',
+            role: 'owner',
+            joinedAt: new Date().toISOString(),
+          };
+          await db.groupMembers.put(defaultCreator);
         }
 
         setGroup(foundGroup);
