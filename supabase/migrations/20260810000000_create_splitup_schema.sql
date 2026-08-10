@@ -1,3 +1,4 @@
+-- Supabase Migration: 20260810000000_create_splitup_schema.sql
 -- Split Up PostgreSQL Database Schema & Row-Level Security Policies
 -- Table: public.users (stores authenticated and offline user profiles)
 

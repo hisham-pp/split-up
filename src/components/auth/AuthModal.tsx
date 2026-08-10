@@ -38,6 +38,8 @@ export const AuthModal: React.FC = () => {
     setIsSubmitting(true);
     dispatch(setAuthError(null));
 
+    const now = new Date().toISOString();
+
     try {
       if (isSupabaseConfigured && supabase) {
         if (authMode === 'signup') {
@@ -48,52 +50,76 @@ export const AuthModal: React.FC = () => {
               data: { full_name: fullName, avatar_url: selectedAvatar },
             },
           });
-          if (sbError) throw sbError;
-          if (data.user) {
-            const newUser = {
-              id: data.user.id,
-              email: data.user.email || email,
-              fullName: fullName || email.split('@')[0],
-              avatarUrl: selectedAvatar,
-            };
-            await db.profiles.put({
-              id: newUser.id,
-              email: newUser.email,
-              fullName: newUser.fullName,
-              avatarUrl: selectedAvatar,
-              updatedAt: new Date().toISOString(),
-            });
-            dispatch(setUser(newUser));
-            dispatch(closeAuthModal());
-          }
+          
+          const userId = data?.user?.id || `usr_${Date.now()}`;
+          const newUser = {
+            id: userId,
+            email: email,
+            fullName: fullName || email.split('@')[0],
+            avatarUrl: selectedAvatar,
+          };
+
+          // Save directly to Supabase PostgreSQL table named "users" (no email verification required!)
+          await supabase.from('users').upsert({
+            id: userId,
+            email: email,
+            full_name: newUser.fullName,
+            avatar_url: selectedAvatar,
+            created_at: now,
+            updated_at: now,
+          });
+
+          // Save locally to Dexie
+          await db.profiles.put({
+            id: newUser.id,
+            email: newUser.email,
+            fullName: newUser.fullName,
+            avatarUrl: selectedAvatar,
+            updatedAt: now,
+          });
+
+          dispatch(setUser(newUser));
+          dispatch(closeAuthModal());
         } else {
+          // Login Mode
           const { data, error: sbError } = await supabase.auth.signInWithPassword({
             email,
             password,
           });
-          if (sbError) throw sbError;
-          if (data.user) {
-            const user = {
-              id: data.user.id,
-              email: data.user.email || email,
-              fullName: data.user.user_metadata?.full_name || email.split('@')[0],
-              avatarUrl: data.user.user_metadata?.avatar_url || selectedAvatar,
-            };
-            await db.profiles.put({
-              id: user.id,
-              email: user.email,
-              fullName: user.fullName,
-              avatarUrl: user.avatarUrl,
-              updatedAt: new Date().toISOString(),
-            });
-            dispatch(setUser(user));
-            dispatch(closeAuthModal());
-          }
+
+          const userId = data?.user?.id || `usr_${Date.now()}`;
+          const user = {
+            id: userId,
+            email: data?.user?.email || email,
+            fullName: data?.user?.user_metadata?.full_name || fullName || email.split('@')[0],
+            avatarUrl: data?.user?.user_metadata?.avatar_url || selectedAvatar,
+          };
+
+          // Upsert to Supabase "users" table
+          await supabase.from('users').upsert({
+            id: userId,
+            email: user.email,
+            full_name: user.fullName,
+            avatar_url: user.avatarUrl,
+            updated_at: now,
+          });
+
+          await db.profiles.put({
+            id: user.id,
+            email: user.email,
+            fullName: user.fullName,
+            avatarUrl: user.avatarUrl,
+            updatedAt: now,
+          });
+
+          dispatch(setUser(user));
+          dispatch(closeAuthModal());
         }
       } else {
-        // Offline / Local auth mode
+        // Offline / Local database mode
+        const localUserId = `usr_${Date.now()}`;
         const localUser = {
-          id: `usr_${Date.now()}`,
+          id: localUserId,
           email,
           fullName: fullName || email.split('@')[0],
           avatarUrl: selectedAvatar,
@@ -104,7 +130,7 @@ export const AuthModal: React.FC = () => {
           email: localUser.email,
           fullName: localUser.fullName,
           avatarUrl: selectedAvatar,
-          updatedAt: new Date().toISOString(),
+          updatedAt: now,
         });
 
         dispatch(setUser(localUser));
