@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store/store';
@@ -10,7 +10,7 @@ import { setActiveGroup } from '@/store/slices/uiSlice';
 import { ArrowLeft, CheckCircle, Sparkles, AlertCircle } from 'lucide-react';
 import { AuthModal } from '@/components/auth/AuthModal';
 
-export default function JoinGroupPage({ params }: { params: { inviteCode: string } }) {
+export default function JoinGroupPage({ params }: { params: Promise<{ inviteCode: string }> }) {
   const router = useRouter();
   const dispatch = useDispatch();
   const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
@@ -20,7 +20,8 @@ export default function JoinGroupPage({ params }: { params: { inviteCode: string
   const [joining, setJoining] = useState(false);
   const [error, setError] = useState('');
 
-  const inviteCode = params.inviteCode;
+  const unwrappedParams = use(params);
+  const inviteCode = unwrappedParams.inviteCode;
 
   useEffect(() => {
     async function fetchGroup() {

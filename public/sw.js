@@ -2,7 +2,7 @@ const CACHE_NAME = 'split-up-v1';
 const ASSETS_TO_CACHE = [
   '/',
   '/manifest.json',
-  '/favicon.ico',
+  '/favicon.svg',
 ];
 
 self.addEventListener('install', (event) => {
