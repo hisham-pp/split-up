@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { Expense, useDeleteExpenseMutation } from '@/store/api/expenseApi';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
+import { db } from '@/lib/db/db';
+import { queueMutation } from '@/lib/sync/syncEngine';
 import { formatCurrency, formatDateRelative } from '@/utils/formatters';
 import { triggerHaptic } from '@/utils/haptics';
 import {
@@ -18,9 +19,24 @@ import {
   Edit3,
 } from 'lucide-react';
 
+export interface UIExpenseItem {
+  id: string;
+  groupId: string;
+  groupName: string;
+  title: string;
+  amount: number;
+  paidBy: { id: string; name: string; avatar?: string; email?: string; isCurrentUser?: boolean };
+  date: string;
+  category: 'Food' | 'Travel' | 'Housing' | 'Entertainment' | 'Shopping' | 'Utilities' | 'Other';
+  splitMode: 'Equal' | 'Unequal' | 'Percentage' | 'Shares';
+  splitBetween: any[];
+  notes?: string;
+}
+
 interface SwipeableExpenseCardProps {
-  expense: Expense;
-  onEdit?: (expense: Expense) => void;
+  expense: UIExpenseItem;
+  onEdit?: (expense: UIExpenseItem) => void;
+  onDeleted?: () => void;
 }
 
 const CATEGORY_ICONS: Record<string, React.FC<{ className?: string }>> = {
@@ -36,9 +52,9 @@ const CATEGORY_ICONS: Record<string, React.FC<{ className?: string }>> = {
 export const SwipeableExpenseCard: React.FC<SwipeableExpenseCardProps> = ({
   expense,
   onEdit,
+  onDeleted,
 }) => {
   const currency = useSelector((state: RootState) => state.ui.currency);
-  const [deleteExpense] = useDeleteExpenseMutation();
   const [translateX, setTranslateX] = useState(0);
   const [isSwiping, setIsSwiping] = useState(false);
   const startXRef = useRef(0);
@@ -53,7 +69,6 @@ export const SwipeableExpenseCard: React.FC<SwipeableExpenseCardProps> = ({
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!isSwiping) return;
     const deltaX = e.touches[0].clientX - startXRef.current;
-    // Only allow swiping left (negative deltaX)
     if (deltaX < 0 && deltaX > -140) {
       setTranslateX(deltaX);
     }
@@ -62,16 +77,19 @@ export const SwipeableExpenseCard: React.FC<SwipeableExpenseCardProps> = ({
   const handleTouchEnd = () => {
     setIsSwiping(false);
     if (translateX < -70) {
-      setTranslateX(-130); // Snap open actions
+      setTranslateX(-130);
       triggerHaptic(20);
     } else {
-      setTranslateX(0); // Snap shut
+      setTranslateX(0);
     }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     triggerHaptic([30, 60]);
-    deleteExpense(expense.id);
+    const now = new Date().toISOString();
+    await db.expenses.update(expense.id, { deletedAt: now });
+    await queueMutation('DELETE_EXPENSE', { id: expense.id });
+    onDeleted?.();
   };
 
   return (
@@ -83,17 +101,17 @@ export const SwipeableExpenseCard: React.FC<SwipeableExpenseCardProps> = ({
             setTranslateX(0);
             onEdit?.(expense);
           }}
-          className="w-12 h-12 rounded-xl bg-indigo-600/30 text-indigo-400 border border-indigo-500/40 flex items-center justify-center active:scale-90 transition-transform"
+          className="w-11 h-11 rounded-xl bg-indigo-600/30 text-indigo-400 border border-indigo-500/40 flex items-center justify-center active:scale-90 transition-transform"
           aria-label="Edit"
         >
-          <Edit3 className="w-5 h-5" />
+          <Edit3 className="w-4 h-4" />
         </button>
         <button
           onClick={handleDelete}
-          className="w-12 h-12 rounded-xl bg-red-600/30 text-red-400 border border-red-500/40 flex items-center justify-center active:scale-90 transition-transform"
+          className="w-11 h-11 rounded-xl bg-rose-600/30 text-rose-400 border border-rose-500/40 flex items-center justify-center active:scale-90 transition-transform"
           aria-label="Delete"
         >
-          <Trash2 className="w-5 h-5" />
+          <Trash2 className="w-4 h-4" />
         </button>
       </div>
 
@@ -118,11 +136,7 @@ export const SwipeableExpenseCard: React.FC<SwipeableExpenseCardProps> = ({
               {expense.title}
             </h3>
             <p className="text-xs text-slate-400 truncate">
-              Paid by{' '}
-              <span className="text-slate-200 font-medium">
-                {expense.paidBy.isCurrentUser ? 'You' : expense.paidBy.name}
-              </span>{' '}
-              · {formatDateRelative(expense.date)}
+              <span className="text-indigo-300 font-medium">{expense.groupName}</span> · {formatDateRelative(expense.date)}
             </p>
           </div>
         </div>

@@ -1,215 +1,274 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store/store';
-import { openAddExpenseSheet } from '@/store/slices/uiSlice';
-import {
-  Group,
-  useGetExpensesQuery,
-  useSettleBalanceMutation,
-  CURRENT_USER,
-} from '@/store/api/expenseApi';
+import { setActiveGroup, openAddExpenseSheet } from '@/store/slices/uiSlice';
+import { db, LocalGroup, LocalExpense, LocalGroupMember, LocalSettlement } from '@/lib/db/db';
+import { computeGroupBalances, toMajorUnits } from '@/lib/financial/financialEngine';
+import { simplifyDebts, SimplifiedTransaction } from '@/lib/financial/debtSimplifier';
 import { formatCurrency } from '@/utils/formatters';
+import { SettleUpModal } from '@/components/modals/SettleUpModal';
+import { InviteModal } from '@/components/modals/InviteModal';
+import { ExportModal } from '@/components/modals/ExportModal';
+import { GroupModal } from '@/components/modals/GroupModal';
 import { SwipeableExpenseCard } from '@/components/ui/SwipeableExpenseCard';
 import { triggerHaptic } from '@/utils/haptics';
-import confetti from 'canvas-confetti';
 import {
-  Users,
+  ArrowLeft,
   Plus,
-  CheckCircle2,
-  PieChart,
-  Receipt,
-  Sparkles,
+  CheckCircle,
+  Share2,
+  Download,
+  Edit,
+  Users,
+  TrendingUp,
   ArrowRight,
 } from 'lucide-react';
 
 interface GroupDetailViewProps {
-  group: Group;
+  group: LocalGroup;
 }
 
 export const GroupDetailView: React.FC<GroupDetailViewProps> = ({ group }) => {
   const dispatch = useDispatch();
   const currency = useSelector((state: RootState) => state.ui.currency);
-  const [activeSegment, setActiveSegment] = useState<'overview' | 'expenses' | 'balances'>('overview');
-  const { data: expenses = [] } = useGetExpensesQuery(group.id);
-  const [settleBalance] = useSettleBalanceMutation();
+  const currentUser = useSelector((state: RootState) => state.auth.user);
 
-  const handleSettleUp = async () => {
-    triggerHaptic([40, 80, 40]);
-    confetti({
-      particleCount: 80,
-      spread: 70,
-      origin: { y: 0.6 },
+  const [members, setMembers] = useState<LocalGroupMember[]>([]);
+  const [expenses, setExpenses] = useState<LocalExpense[]>([]);
+  const [settlements, setSettlements] = useState<LocalSettlement[]>([]);
+  const [balances, setBalances] = useState<Record<string, { totalPaid: number; totalOwed: number; netBalance: number }>>({});
+  const [simplifiedTxs, setSimplifiedTxs] = useState<SimplifiedTransaction[]>([]);
+
+  // Modals
+  const [isSettleModalOpen, setIsSettleModalOpen] = useState(false);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isEditGroupModalOpen, setIsEditGroupModalOpen] = useState(false);
+
+  const loadGroupDetails = async () => {
+    const gMembers = await db.groupMembers.where('groupId').equals(group.id).toArray();
+    setMembers(gMembers);
+
+    const gExpenses = await db.expenses
+      .where('groupId')
+      .equals(group.id)
+      .filter((e) => e.deletedAt === null || e.deletedAt === undefined)
+      .reverse()
+      .sortBy('date');
+    setExpenses(gExpenses);
+
+    const gSettlements = await db.settlements
+      .where('groupId')
+      .equals(group.id)
+      .filter((s) => s.deletedAt === null || s.deletedAt === undefined)
+      .toArray();
+    setSettlements(gSettlements);
+
+    // Build calculations input
+    const memberIds = gMembers.map((m) => m.id);
+    const expCalculationsList = [];
+
+    for (const e of gExpenses) {
+      const payers = await db.expensePayers.where('expenseId').equals(e.id).toArray();
+      const splits = await db.expenseSplits.where('expenseId').equals(e.id).toArray();
+      expCalculationsList.push({ payers, splits });
+    }
+
+    const computedBalances = computeGroupBalances(memberIds, expCalculationsList, gSettlements);
+    setBalances(computedBalances);
+
+    // Calculate simplified debts
+    const netBalMap: Record<string, number> = {};
+    Object.entries(computedBalances).forEach(([mId, info]) => {
+      netBalMap[mId] = info.netBalance;
     });
-    await settleBalance({ groupId: group.id, amount: Math.abs(group.userNetBalance) });
+
+    const simplified = simplifyDebts(netBalMap);
+    setSimplifiedTxs(simplified);
   };
 
+  useEffect(() => {
+    loadGroupDetails();
+    const interval = setInterval(loadGroupDetails, 3000);
+    return () => clearInterval(interval);
+  }, [group.id]);
+
+  const getMemberName = (id: string) => {
+    const m = members.find((mem) => mem.id === id);
+    return m ? m.memberName : 'Member';
+  };
+
+  const totalGroupSpendCents = expenses.reduce((acc, e) => acc + e.amountCents, 0);
+
   return (
-    <div className="space-y-6 pb-6">
-      {/* Group Net Balance Card */}
-      <div className="relative overflow-hidden rounded-3xl bg-slate-900 border border-slate-800 p-6 shadow-xl">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
-              Your Net Balance
-            </p>
-            <h2
-              className={`text-3xl font-extrabold tracking-tight ${
-                group.userNetBalance > 0
-                  ? 'text-emerald-400'
-                  : group.userNetBalance < 0
-                  ? 'text-rose-400'
-                  : 'text-slate-300'
-              }`}
-            >
-              {group.userNetBalance > 0
-                ? `You get ${formatCurrency(group.userNetBalance, currency)}`
-                : group.userNetBalance < 0
-                ? `You owe ${formatCurrency(Math.abs(group.userNetBalance), currency)}`
-                : 'Settled Up'}
-            </h2>
-          </div>
+    <div className="space-y-6 pb-6 animate-fade-in">
+      {/* Group Detail Banner Header */}
+      <div className="relative rounded-3xl overflow-hidden bg-slate-900 border border-slate-800 shadow-xl">
+        <div className="h-36 sm:h-44 w-full relative">
+          <img
+            src={
+              group.coverImage ||
+              'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=600&q=80'
+            }
+            alt={group.name}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
 
-          {group.userNetBalance !== 0 && (
-            <button
-              onClick={handleSettleUp}
-              className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-600/20 active:scale-95 transition-all"
-            >
-              Settle Up
-            </button>
-          )}
-        </div>
-
-        {/* Group Members Avatars */}
-        <div className="flex items-center gap-2 mt-5 pt-4 border-t border-slate-800">
-          <div className="flex -space-x-2">
-            {group.members.map((m) => (
-              <img
-                key={m.id}
-                src={m.avatar}
-                alt={m.name}
-                className="w-7 h-7 rounded-full object-cover ring-2 ring-slate-900"
-              />
-            ))}
-          </div>
-          <span className="text-xs text-slate-400 font-medium ml-1">
-            {group.members.map((m) => (m.isCurrentUser ? 'You' : m.name)).join(', ')}
-          </span>
-        </div>
-      </div>
-
-      {/* Segmented Control Navigation (Overview | Expenses | Balances) */}
-      <div className="grid grid-cols-3 p-1 rounded-2xl bg-slate-900 border border-slate-800">
-        {(['overview', 'expenses', 'balances'] as const).map((segment) => (
           <button
-            key={segment}
             onClick={() => {
               triggerHaptic(10);
-              setActiveSegment(segment);
+              dispatch(setActiveGroup(null));
             }}
-            className={`py-2 rounded-xl text-xs font-bold capitalize transition-all ${
-              activeSegment === segment
-                ? 'bg-indigo-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
+            className="absolute top-4 left-4 p-2.5 rounded-full bg-slate-950/70 text-slate-200 hover:bg-slate-950 transition-colors backdrop-blur-md"
           >
-            {segment}
+            <ArrowLeft className="w-5 h-5" />
           </button>
-        ))}
-      </div>
 
-      {/* Segment Content */}
-      {activeSegment === 'overview' && (
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800">
-              <p className="text-xs text-slate-400">Total Group Spend</p>
-              <p className="text-lg font-bold text-white mt-1">
-                {formatCurrency(group.totalSpend, currency)}
-              </p>
-            </div>
-            <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800">
-              <p className="text-xs text-slate-400">Total Expenses</p>
-              <p className="text-lg font-bold text-white mt-1">
-                {expenses.length} items
-              </p>
-            </div>
+          <div className="absolute top-4 right-4 flex gap-2">
+            <button
+              onClick={() => setIsEditGroupModalOpen(true)}
+              className="p-2.5 rounded-full bg-slate-950/70 text-slate-200 hover:bg-slate-950 transition-colors backdrop-blur-md"
+              title="Edit Group"
+            >
+              <Edit className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setIsInviteModalOpen(true)}
+              className="p-2.5 rounded-full bg-slate-950/70 text-slate-200 hover:bg-slate-950 transition-colors backdrop-blur-md"
+              title="Invite Members"
+            >
+              <Share2 className="w-4 h-4" />
+            </button>
           </div>
+        </div>
 
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-bold text-slate-200">Recent Expenses</h3>
+        <div className="p-6 -mt-12 relative z-10">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div>
+              <span className="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold uppercase tracking-wider">
+                {group.category}
+              </span>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mt-1">
+                {group.name}
+              </h1>
+              <p className="text-xs text-slate-400 mt-1 flex items-center gap-2">
+                <Users className="w-3.5 h-3.5" />
+                <span>{members.length} members</span>
+                <span>•</span>
+                <span>Total Spend: {formatCurrency(toMajorUnits(totalGroupSpendCents), currency)}</span>
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
               <button
-                onClick={() => setActiveSegment('expenses')}
-                className="text-xs text-indigo-400 font-semibold"
+                onClick={() => {
+                  triggerHaptic(10);
+                  dispatch(openAddExpenseSheet());
+                }}
+                className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-lg shadow-indigo-600/30 transition-all active:scale-95 flex items-center gap-1.5"
               >
-                View all
+                <Plus className="w-4 h-4" />
+                <span>Add Expense</span>
+              </button>
+
+              <button
+                onClick={() => setIsSettleModalOpen(true)}
+                className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-lg shadow-emerald-600/30 transition-all active:scale-95 flex items-center gap-1.5"
+              >
+                <CheckCircle className="w-4 h-4" />
+                <span>Settle Up</span>
+              </button>
+
+              <button
+                onClick={() => setIsExportModalOpen(true)}
+                className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all"
+                title="Export Data"
+              >
+                <Download className="w-4 h-4" />
               </button>
             </div>
-            <div className="space-y-1">
-              {expenses.slice(0, 3).map((exp) => (
-                <SwipeableExpenseCard key={exp.id} expense={exp} />
-              ))}
-            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Simplified Debts Recommendation Banner */}
+      {simplifiedTxs.length > 0 && (
+        <div className="p-5 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold text-indigo-300 uppercase tracking-wider flex items-center gap-1.5">
+              <TrendingUp className="w-4 h-4 text-indigo-400" />
+              <span>Simplified Debt Settlement Plan</span>
+            </h3>
+            <span className="text-[11px] text-slate-400">{simplifiedTxs.length} payments to settle group</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {simplifiedTxs.map((tx, idx) => (
+              <div
+                key={idx}
+                className="p-3 rounded-2xl bg-slate-950 border border-slate-800/80 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="font-semibold text-slate-200">{getMemberName(tx.fromMemberId)}</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-slate-500" />
+                  <span className="font-semibold text-slate-200">{getMemberName(tx.toMemberId)}</span>
+                </div>
+                <span className="font-bold text-emerald-400 text-xs">
+                  {formatCurrency(toMajorUnits(tx.amountCents), currency)}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
       )}
 
-      {activeSegment === 'expenses' && (
-        <div className="space-y-2">
-          {expenses.length === 0 ? (
-            <div className="p-8 text-center text-slate-500">
-              No expenses added yet to this group.
-            </div>
-          ) : (
-            expenses.map((exp) => (
-              <SwipeableExpenseCard key={exp.id} expense={exp} />
-            ))
-          )}
-        </div>
-      )}
+      {/* Group Members & Individual Net Balances */}
+      <div className="p-5 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl">
+        <h3 className="text-sm font-bold text-slate-100 mb-3">Group Members</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {members.map((m) => {
+            const balInfo = balances[m.id] || { totalPaid: 0, totalOwed: 0, netBalance: 0 };
+            const netMajor = toMajorUnits(balInfo.netBalance);
 
-      {activeSegment === 'balances' && (
-        <div className="space-y-3">
-          <h3 className="text-sm font-bold text-slate-200">Group Balances Breakdown</h3>
-          {group.members.map((m) => {
-            const isUser = m.isCurrentUser;
             return (
               <div
                 key={m.id}
-                className="flex items-center justify-between p-4 rounded-2xl bg-slate-900 border border-slate-800"
+                className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800/80 flex items-center justify-between"
               >
                 <div className="flex items-center gap-3">
                   <img
-                    src={m.avatar}
-                    alt={m.name}
-                    className="w-10 h-10 rounded-full object-cover ring-2 ring-slate-800"
+                    src={
+                      m.memberAvatar ||
+                      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
+                    }
+                    alt={m.memberName}
+                    className="w-9 h-9 rounded-full object-cover ring-1 ring-slate-700"
                   />
                   <div>
-                    <h4 className="font-semibold text-slate-200 text-sm">
-                      {isUser ? 'You' : m.name}
-                    </h4>
-                    <p className="text-xs text-slate-400">{m.email}</p>
+                    <p className="text-xs font-bold text-slate-200">{m.memberName}</p>
+                    <p className="text-[10px] text-slate-400">
+                      Paid {formatCurrency(toMajorUnits(balInfo.totalPaid), currency)}
+                    </p>
                   </div>
                 </div>
 
                 <div className="text-right">
                   <p
-                    className={`font-bold text-sm ${
-                      isUser && group.userNetBalance > 0
+                    className={`text-xs font-bold ${
+                      netMajor > 0
                         ? 'text-emerald-400'
-                        : isUser && group.userNetBalance < 0
+                        : netMajor < 0
                         ? 'text-rose-400'
                         : 'text-slate-400'
                     }`}
                   >
-                    {isUser
-                      ? group.userNetBalance > 0
-                        ? `Gets ${formatCurrency(group.userNetBalance, currency)}`
-                        : group.userNetBalance < 0
-                        ? `Owes ${formatCurrency(Math.abs(group.userNetBalance), currency)}`
-                        : 'Settled'
+                    {netMajor > 0
+                      ? `+${formatCurrency(netMajor, currency)}`
+                      : netMajor < 0
+                      ? `${formatCurrency(netMajor, currency)}`
                       : 'Settled'}
                   </p>
                 </div>
@@ -217,7 +276,87 @@ export const GroupDetailView: React.FC<GroupDetailViewProps> = ({ group }) => {
             );
           })}
         </div>
-      )}
+      </div>
+
+      {/* Expenses History List */}
+      <div>
+        <h3 className="text-base font-bold text-slate-100 mb-3">Group Expenses ({expenses.length})</h3>
+
+        {expenses.length === 0 ? (
+          <div className="p-8 text-center bg-slate-900/40 rounded-2xl border border-slate-800">
+            <p className="text-sm font-medium text-slate-400">No expenses recorded in this group yet</p>
+            <button
+              onClick={() => dispatch(openAddExpenseSheet())}
+              className="mt-3 text-xs font-semibold px-4 py-2 rounded-xl bg-indigo-600 text-white"
+            >
+              + Add first expense
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {expenses.map((expense) => (
+              <SwipeableExpenseCard
+                key={expense.id}
+                expense={{
+                  id: expense.id,
+                  groupId: expense.groupId,
+                  groupName: group.name,
+                  title: expense.title,
+                  amount: toMajorUnits(expense.amountCents),
+                  paidBy: {
+                    id: 'usr_hisham',
+                    name: 'Hisham',
+                    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+                    email: 'hisham@example.com',
+                  },
+                  date: expense.date,
+                  category: expense.category as any,
+                  splitMode: expense.splitMode as any,
+                  splitBetween: [],
+                  notes: expense.notes,
+                }}
+                onDeleted={() => loadGroupDetails()}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Modals */}
+      <SettleUpModal
+        isOpen={isSettleModalOpen}
+        onClose={() => setIsSettleModalOpen(false)}
+        group={group}
+        members={members}
+        simplifiedTransactions={simplifiedTxs}
+        onSettled={() => loadGroupDetails()}
+        currency={currency}
+      />
+
+      <InviteModal
+        isOpen={isInviteModalOpen}
+        onClose={() => setIsInviteModalOpen(false)}
+        group={group}
+      />
+
+      <ExportModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        group={group}
+        members={members}
+        expenses={expenses}
+        settlements={settlements}
+        balances={balances}
+        currency={currency}
+      />
+
+      <GroupModal
+        isOpen={isEditGroupModalOpen}
+        onClose={() => setIsEditGroupModalOpen(false)}
+        groupToEdit={group}
+        onGroupSaved={() => loadGroupDetails()}
+        currentUserId={currentUser?.id || 'usr_hisham'}
+      />
     </div>
   );
 };

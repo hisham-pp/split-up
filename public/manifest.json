@@ -1,17 +1,22 @@
 {
-  "name": "SplitUp",
-  "short_name": "SplitUp",
+  "name": "Split Up - Expense Sharing",
+  "short_name": "Split Up",
+  "description": "Production-ready offline-first expense sharing application",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f172a",
+  "background_color": "#020617",
   "theme_color": "#4f46e5",
-  "orientation": "portrait",
+  "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/favicon.svg",
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
   ]
 }

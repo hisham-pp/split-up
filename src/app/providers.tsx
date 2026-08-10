@@ -1,11 +1,30 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { Provider } from 'react-redux';
 import { store } from '@/store/store';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
+import { seedInitialLocalData } from '@/lib/db/db';
+import { initializeAuthSession } from '@/store/slices/authSlice';
+import { processSyncQueue } from '@/lib/sync/syncEngine';
 
 export function Providers({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    async function initApp() {
+      await seedInitialLocalData();
+      await initializeAuthSession(store.dispatch);
+      await processSyncQueue();
+
+      // Register PWA Service Worker
+      if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
+        navigator.serviceWorker.register('/sw.js').catch((err) => {
+          console.log('SW registration skipped:', err);
+        });
+      }
+    }
+    initApp();
+  }, []);
+
   const darkTheme = useMemo(
     () =>
       createTheme({
@@ -29,21 +48,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
           },
         },
         typography: {
-          fontFamily: "'Plus Jakarta Sans', sans-serif",
+          fontFamily: 'system-ui, -apple-system, sans-serif',
         },
         shape: {
           borderRadius: 16,
-        },
-        components: {
-          MuiButton: {
-            styleOverrides: {
-              root: {
-                textTransform: 'none',
-                fontWeight: 600,
-                borderRadius: '12px',
-              },
-            },
-          },
         },
       }),
     []

@@ -13,13 +13,14 @@ import { GroupDetailView } from '@/views/GroupDetailView';
 import { ActivityView } from '@/views/ActivityView';
 import { ProfileView } from '@/views/ProfileView';
 import { AddExpenseSheet } from '@/views/AddExpenseSheet';
+import { AuthModal } from '@/components/auth/AuthModal';
 
 export default function MainPage() {
   const { activeTab, activeGroup } = useSelector((state: RootState) => state.ui);
 
   const renderCurrentView = () => {
     if (activeGroup) {
-      return <GroupDetailView group={activeGroup} />;
+      return <GroupDetailView group={activeGroup as any} />;
     }
 
     switch (activeTab) {
@@ -37,7 +38,7 @@ export default function MainPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-slate-950 text-slate-100">
+    <div className="flex min-h-screen bg-slate-950 text-slate-100 font-sans antialiased">
       {/* Desktop Navigation Sidebar (>1024px) */}
       <DesktopSidebar />
 
@@ -59,6 +60,9 @@ export default function MainPage() {
 
         {/* Add Expense Bottom Sheet Modal */}
         <AddExpenseSheet />
+
+        {/* Authentication Modal */}
+        <AuthModal />
       </div>
     </div>
   );
