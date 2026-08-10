@@ -1,26 +1,30 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+// Supports new Supabase Publishable Key (sb_publishable_...) with fallback to legacy Anon key
+const supabasePublishableKey =
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+  '';
 
 export const isSupabaseConfigured = Boolean(
   supabaseUrl &&
   supabaseUrl.startsWith('https://') &&
-  supabaseAnonKey &&
-  supabaseAnonKey.length > 10
+  supabasePublishableKey &&
+  supabasePublishableKey.length > 10
 );
 
 let supabaseBrowserClientInstance: SupabaseClient | null = null;
 
 /**
  * Creates or retrieves the singleton Supabase client instance for browser environments.
- * Follows modern Supabase JS v2 client initialization guidelines with session auto-refresh.
+ * Supports modern Supabase Publishable API keys (sb_publishable_...) and legacy anon keys.
  */
 export function createBrowserClient(): SupabaseClient | null {
   if (!isSupabaseConfigured) return null;
 
   if (!supabaseBrowserClientInstance) {
-    supabaseBrowserClientInstance = createClient(supabaseUrl, supabaseAnonKey, {
+    supabaseBrowserClientInstance = createClient(supabaseUrl, supabasePublishableKey, {
       auth: {
         persistSession: true,
         autoRefreshToken: true,
