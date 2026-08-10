@@ -57,10 +57,19 @@ export async function queueMutation(operation: QueueOperation, payload: any) {
   }
 }
 
-function sanitizeUuid(id?: string | null): string | null {
-  if (!id) return null;
+export function toValidUuid(id?: string | null): string {
+  if (!id) return '00000000-0000-4000-8000-000000000000';
   const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-  return isUuid ? id : null;
+  if (isUuid) return id;
+
+  let hex = '';
+  for (let i = 0; i < id.length; i++) {
+    const code = id.charCodeAt(i).toString(16);
+    hex += code.length === 1 ? '0' + code : code;
+  }
+  hex = (hex + '00000000000000000000000000000000').slice(0, 32);
+
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-4${hex.slice(13, 16)}-a${hex.slice(17, 20)}-${hex.slice(20, 32)}`;
 }
 
 /**
@@ -81,7 +90,7 @@ export async function processSyncQueue() {
   notifyStatus();
 
   try {
-    // Reset any failed items so they get a fresh retry with sanitized payloads
+    // Reset any failed items so they get a fresh retry with valid UUID payloads
     const failedItems = await db.syncQueue.where('status').equals('failed').toArray();
     for (const fItem of failedItems) {
       await db.syncQueue.update(fItem.id, { status: 'pending', retries: 0 });
@@ -118,11 +127,11 @@ export async function processSyncQueue() {
     for (const lg of allLocalGroups) {
       try {
         await supabase.from('groups').upsert({
-          id: lg.id,
+          id: toValidUuid(lg.id),
           name: lg.name,
           category: lg.category,
           cover_image: lg.coverImage,
-          created_by: sanitizeUuid(lg.createdBy),
+          created_by: toValidUuid(lg.createdBy),
           created_at: lg.createdAt,
           updated_at: lg.updatedAt,
         });
@@ -130,9 +139,9 @@ export async function processSyncQueue() {
         const lgMembers = await db.groupMembers.where('groupId').equals(lg.id).toArray();
         for (const m of lgMembers) {
           await supabase.from('group_members').upsert({
-            id: m.id,
-            group_id: m.groupId,
-            user_id: sanitizeUuid(m.userId),
+            id: toValidUuid(m.id),
+            group_id: toValidUuid(m.groupId),
+            user_id: toValidUuid(m.userId),
             member_name: m.memberName,
             member_email: m.memberEmail || null,
             member_avatar: m.memberAvatar || null,
@@ -167,11 +176,11 @@ async function executeRemoteMutation(item: SyncQueueItem) {
   switch (operation) {
     case 'CREATE_GROUP': {
       const { error } = await supabase.from('groups').upsert({
-        id: payload.id,
+        id: toValidUuid(payload.id),
         name: payload.name,
         category: payload.category,
         cover_image: payload.coverImage,
-        created_by: sanitizeUuid(payload.createdBy),
+        created_by: toValidUuid(payload.createdBy),
         created_at: payload.createdAt,
         updated_at: payload.updatedAt,
       });
@@ -184,22 +193,22 @@ async function executeRemoteMutation(item: SyncQueueItem) {
         category: payload.category,
         cover_image: payload.coverImage,
         updated_at: new Date().toISOString(),
-      }).eq('id', payload.id);
+      }).eq('id', toValidUuid(payload.id));
       if (error) throw error;
       break;
     }
     case 'DELETE_GROUP': {
       const { error } = await supabase.from('groups').update({
         deleted_at: new Date().toISOString(),
-      }).eq('id', payload.id);
+      }).eq('id', toValidUuid(payload.id));
       if (error) throw error;
       break;
     }
     case 'ADD_MEMBER': {
       const { error } = await supabase.from('group_members').upsert({
-        id: payload.id,
-        group_id: payload.groupId,
-        user_id: sanitizeUuid(payload.userId),
+        id: toValidUuid(payload.id),
+        group_id: toValidUuid(payload.groupId),
+        user_id: toValidUuid(payload.userId),
         member_name: payload.memberName,
         member_email: payload.memberEmail || null,
         member_avatar: payload.memberAvatar || null,
@@ -210,7 +219,7 @@ async function executeRemoteMutation(item: SyncQueueItem) {
       break;
     }
     case 'REMOVE_MEMBER': {
-      const { error } = await supabase.from('group_members').delete().eq('id', payload.id);
+      const { error } = await supabase.from('group_members').delete().eq('id', toValidUuid(payload.id));
       if (error) throw error;
       break;
     }
@@ -218,15 +227,15 @@ async function executeRemoteMutation(item: SyncQueueItem) {
       const { expense, payers, splits } = payload;
 
       const { error: expError } = await supabase.from('expenses').upsert({
-        id: expense.id,
-        group_id: expense.groupId,
+        id: toValidUuid(expense.id),
+        group_id: toValidUuid(expense.groupId),
         title: expense.title,
         amount_cents: expense.amountCents,
         category: expense.category,
         split_mode: expense.splitMode,
         date: expense.date,
         notes: expense.notes,
-        created_by: sanitizeUuid(expense.createdBy),
+        created_by: toValidUuid(expense.createdBy),
         created_at: expense.createdAt,
         updated_at: expense.updatedAt,
       });
@@ -235,9 +244,9 @@ async function executeRemoteMutation(item: SyncQueueItem) {
       if (payers && payers.length > 0) {
         const { error: pError } = await supabase.from('expense_payers').upsert(
           payers.map((p: any) => ({
-            id: p.id,
-            expense_id: p.expenseId,
-            member_id: p.memberId,
+            id: toValidUuid(p.id),
+            expense_id: toValidUuid(p.expenseId),
+            member_id: toValidUuid(p.memberId),
             amount_cents: p.amountCents,
           }))
         );
@@ -247,9 +256,9 @@ async function executeRemoteMutation(item: SyncQueueItem) {
       if (splits && splits.length > 0) {
         const { error: sError } = await supabase.from('expense_splits').upsert(
           splits.map((s: any) => ({
-            id: s.id,
-            expense_id: s.expenseId,
-            member_id: s.memberId,
+            id: toValidUuid(s.id),
+            expense_id: toValidUuid(s.expenseId),
+            member_id: toValidUuid(s.memberId),
             amount_cents: s.amountCents,
             percentage: s.percentage,
             shares: s.shares,
@@ -262,20 +271,20 @@ async function executeRemoteMutation(item: SyncQueueItem) {
     case 'DELETE_EXPENSE': {
       const { error } = await supabase.from('expenses').update({
         deleted_at: new Date().toISOString(),
-      }).eq('id', payload.id);
+      }).eq('id', toValidUuid(payload.id));
       if (error) throw error;
       break;
     }
     case 'CREATE_SETTLEMENT': {
       const { error } = await supabase.from('settlements').upsert({
-        id: payload.id,
-        group_id: payload.groupId,
-        payer_member_id: payload.payerMemberId,
-        payee_member_id: payload.payeeMemberId,
+        id: toValidUuid(payload.id),
+        group_id: toValidUuid(payload.groupId),
+        payer_member_id: toValidUuid(payload.payerMemberId),
+        payee_member_id: toValidUuid(payload.payeeMemberId),
         amount_cents: payload.amountCents,
         date: payload.date,
         notes: payload.notes,
-        created_by: sanitizeUuid(payload.createdBy),
+        created_by: toValidUuid(payload.createdBy),
         created_at: payload.createdAt,
         updated_at: payload.updatedAt,
       });

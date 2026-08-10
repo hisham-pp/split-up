@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store/store';
 import { db, LocalGroup, LocalGroupMember } from '@/lib/db/db';
-import { queueMutation } from '@/lib/sync/syncEngine';
+import { queueMutation, toValidUuid } from '@/lib/sync/syncEngine';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase/supabase';
 import { setActiveGroup } from '@/store/slices/uiSlice';
 import { ArrowLeft, CheckCircle, Sparkles, AlertCircle } from 'lucide-react';
@@ -43,10 +43,11 @@ export default function JoinGroupPage({ params }: { params: Promise<{ inviteCode
         }
 
         if (!foundGroup && isSupabaseConfigured && supabase) {
+          const targetUuid = toValidUuid(groupId);
           const { data } = await supabase
             .from('groups')
             .select('*')
-            .ilike('id', groupId)
+            .eq('id', targetUuid)
             .single();
 
           if (data) {
