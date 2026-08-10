@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store/store';
 import { db, LocalGroup, LocalGroupMember } from '@/lib/db/db';
 import { queueMutation } from '@/lib/sync/syncEngine';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase/supabase';
 import { setActiveGroup } from '@/store/slices/uiSlice';
 import { ArrowLeft, CheckCircle, Sparkles, AlertCircle } from 'lucide-react';
 import { AuthModal } from '@/components/auth/AuthModal';
@@ -34,12 +35,58 @@ export default function JoinGroupPage({ params }: { params: Promise<{ inviteCode
         }
 
         const groupId = match[1].toLowerCase();
-        const foundGroup = await db.groups.get(groupId);
+        let foundGroup = await db.groups.get(groupId);
+
+        if (!foundGroup) {
+          const allGroups = await db.groups.toArray();
+          foundGroup = allGroups.find(g => g.id.toLowerCase() === groupId.toLowerCase());
+        }
+
+        if (!foundGroup && isSupabaseConfigured && supabase) {
+          const { data } = await supabase
+            .from('groups')
+            .select('*')
+            .ilike('id', groupId)
+            .single();
+
+          if (data) {
+            foundGroup = {
+              id: data.id,
+              name: data.name,
+              category: data.category,
+              coverImage: data.cover_image,
+              createdBy: data.created_by,
+              createdAt: data.created_at,
+              updatedAt: data.updated_at,
+            };
+            await db.groups.put(foundGroup);
+
+            const { data: memberData } = await supabase
+              .from('group_members')
+              .select('*')
+              .eq('group_id', data.id);
+
+            if (memberData && memberData.length > 0) {
+              for (const m of memberData) {
+                await db.groupMembers.put({
+                  id: m.id,
+                  groupId: m.group_id,
+                  userId: m.user_id,
+                  memberName: m.member_name,
+                  memberEmail: m.member_email,
+                  memberAvatar: m.member_avatar,
+                  role: m.role || 'member',
+                  joinedAt: m.joined_at,
+                });
+              }
+            }
+          }
+        }
 
         if (foundGroup) {
           setGroup(foundGroup);
         } else {
-          setError('Group not found. Since this is an offline-first demo, make sure you open this link in the same browser where the group was created.');
+          setError('Group not found. Please check if the invite link is correct.');
         }
       } catch (err) {
         setError('An error occurred while fetching the group.');
