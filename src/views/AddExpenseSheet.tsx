@@ -250,12 +250,14 @@ export const AddExpenseSheet: React.FC = () => {
                 />
               </div>
               <div className="mt-2 inline-flex items-center gap-1 bg-surface-container-high px-3 py-1 rounded-full cursor-pointer">
-                <span className="text-xs font-medium text-on-surface-variant">INR</span>
+                <span className="w-4 h-4 rounded-full bg-primary flex items-center justify-center text-[10px] text-on-primary font-bold tracking-tight">IN</span>
+                <span className="text-sm font-medium text-on-surface-variant ml-0.5">INR</span>
+                <ChevronDown className="w-4 h-4 text-on-surface-variant" />
               </div>
             </div>
 
             {/* Input Fields */}
-            <div className="flex flex-col gap-4 mb-6">
+            <div className="flex flex-col gap-4 mb-8">
               <div className="relative bg-surface-container-highest rounded-t-lg border-b border-on-surface-variant focus-within:border-primary focus-within:border-b-2 transition-all">
                 <input
                   type="text"
@@ -270,6 +272,30 @@ export const AddExpenseSheet: React.FC = () => {
                 </label>
               </div>
               
+              <div className="flex gap-4">
+                <div className="relative flex-1 bg-surface-container-highest rounded-t-lg border-b border-on-surface-variant flex items-center focus-within:border-primary focus-within:border-b-2 transition-all">
+                  <Users className="absolute left-4 w-5 h-5 text-on-surface-variant z-10 pointer-events-none" />
+                  <select
+                    value={selectedGroupId}
+                    onChange={(e) => setSelectedGroupId(e.target.value)}
+                    className="w-full bg-transparent border-none pl-12 pr-4 py-4 text-base text-on-surface cursor-pointer focus:outline-none focus:ring-0 appearance-none"
+                  >
+                    {groups.length === 0 && <option value="">No Groups Found</option>}
+                    {groups.map((g) => (
+                      <option key={g.id} value={g.id}>
+                        {g.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <button
+                  type="button"
+                  className="h-[56px] w-[56px] bg-surface-container-highest rounded-lg flex items-center justify-center border-b border-on-surface-variant shrink-0 cursor-not-allowed"
+                >
+                  <Calendar className="w-6 h-6 text-on-surface-variant" />
+                </button>
+              </div>
+
               <div className="flex gap-4">
                 <div className="relative flex-1 bg-surface-container-highest rounded-t-lg border-b border-on-surface-variant flex items-center focus-within:border-primary focus-within:border-b-2 transition-all">
                   <Tag className="absolute left-4 w-5 h-5 text-on-surface-variant z-10 pointer-events-none" />
@@ -289,32 +315,10 @@ export const AddExpenseSheet: React.FC = () => {
                   <ChevronDown className="absolute right-4 w-5 h-5 text-on-surface-variant z-10 pointer-events-none" />
                 </div>
               </div>
-
-              <div className="flex gap-4">
-                <div className="relative flex-1 bg-surface-container-highest rounded-t-lg border-b border-on-surface-variant flex items-center focus-within:border-primary focus-within:border-b-2 transition-all">
-                  <Users className="absolute left-4 w-5 h-5 text-on-surface-variant z-10 pointer-events-none" />
-                  <select
-                    value={selectedGroupId}
-                    onChange={(e) => setSelectedGroupId(e.target.value)}
-                    className="w-full bg-transparent border-none pl-12 pr-10 py-4 text-base text-on-surface cursor-pointer focus:outline-none focus:ring-0 appearance-none"
-                  >
-                    {groups.length === 0 && <option value="">No Groups Found</option>}
-                    {groups.map((g) => (
-                      <option key={g.id} value={g.id}>
-                        {g.name}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-4 w-5 h-5 text-on-surface-variant z-10 pointer-events-none" />
-                </div>
-                <div className="h-[56px] w-[56px] bg-surface-container-highest rounded-lg flex items-center justify-center border-b border-on-surface-variant shrink-0 cursor-not-allowed">
-                  <Calendar className="w-6 h-6 text-on-surface-variant" />
-                </div>
-              </div>
             </div>
 
             {/* Split Options */}
-            <div className="mb-6">
+            <div className="mb-8">
               <p className="text-sm font-medium text-on-surface-variant mb-2">Split type</p>
               <div className="flex bg-surface-container p-1 rounded-full">
                 {(['Equal', 'Unequal', 'Percentage', 'Shares'] as SplitMode[]).map((mode) => (
@@ -336,32 +340,55 @@ export const AddExpenseSheet: React.FC = () => {
 
             {/* Who Paid / Split among */}
             <div className="bg-surface-container-low rounded-xl p-4 flex flex-col gap-4">
-              <div className="flex justify-between items-center relative">
-                <span className="text-sm text-on-surface-variant">Paid by</span>
-                <div className="relative flex items-center">
-                  <select
-                    className="bg-surface-container-highest pl-4 pr-8 py-1.5 rounded-full text-sm font-medium text-on-surface hover:bg-surface-container transition-colors outline-none cursor-pointer border-none appearance-none"
-                    value={selectedPayerId}
-                    onChange={(e) => setSelectedPayerId(e.target.value)}
-                  >
-                    {members.length === 0 && <option value="">No one</option>}
-                    {members.map((m) => (
-                      <option key={m.id} value={m.id}>
-                        {m.memberName}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-2 w-4 h-4 text-on-surface pointer-events-none" />
+              
+              <div className="flex flex-col gap-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-normal text-on-surface-variant">Paid by</span>
+                  <div className="relative group">
+                    <button type="button" className="flex items-center gap-2 bg-surface-container-highest px-3 py-1.5 rounded-full hover:bg-surface-container transition-colors">
+                      <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center text-on-primary text-[10px] uppercase font-bold">
+                        {members.find(m => m.id === selectedPayerId)?.memberName?.charAt(0) || '?'}
+                      </div>
+                      <span className="text-sm font-medium text-on-surface max-w-[100px] truncate">
+                        {members.find(m => m.id === selectedPayerId)?.memberName || 'No one'}
+                      </span>
+                    </button>
+                    {/* Hover Dropdown */}
+                    <div className="absolute right-0 top-full mt-1 w-48 bg-surface-container-highest rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 overflow-hidden border border-outline/10">
+                      {members.map(m => (
+                        <div
+                          key={m.id}
+                          onClick={() => setSelectedPayerId(m.id)}
+                          className="px-4 py-2 hover:bg-surface-variant cursor-pointer text-sm font-medium text-on-surface flex items-center gap-2"
+                        >
+                          <div className="w-5 h-5 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[10px] uppercase font-bold shrink-0">
+                            {m.memberName.charAt(0)}
+                          </div>
+                          <span className="truncate">{m.memberName}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
               
               <hr className="border-outline-variant/30" />
               
-              <div className="flex flex-col gap-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-on-surface-variant">Split among</span>
-                  <button type="button" className="bg-surface-container-highest px-4 py-1.5 rounded-full text-sm font-medium text-on-surface pointer-events-none">
-                    {selectedSplitMemberIds.length} members
+              <div className="flex flex-col gap-2 relative group">
+                <div className="flex justify-between items-center cursor-pointer">
+                  <span className="text-sm font-normal text-on-surface-variant">Split among</span>
+                  <button type="button" className="flex items-center gap-2 bg-surface-container-highest px-3 py-1.5 rounded-full hover:bg-surface-container transition-colors">
+                    <div className="flex -space-x-2">
+                      <div className="w-5 h-5 rounded-full bg-tertiary flex items-center justify-center text-on-tertiary text-[10px] font-bold border border-surface-container-low z-10">
+                        {selectedSplitMemberIds.length > 0 ? members.find(m => m.id === selectedSplitMemberIds[0])?.memberName?.charAt(0) || '?' : '?'}
+                      </div>
+                      <div className="w-5 h-5 rounded-full bg-secondary flex items-center justify-center text-on-secondary text-[10px] font-bold border border-surface-container-low">
+                        {selectedSplitMemberIds.length}
+                      </div>
+                    </div>
+                    <span className="text-sm font-medium text-on-surface">
+                      {selectedSplitMemberIds.length === members.length ? `All ${members.length} members` : `${selectedSplitMemberIds.length} members`}
+                    </span>
                   </button>
                 </div>
 
@@ -461,7 +488,7 @@ export const AddExpenseSheet: React.FC = () => {
             type="submit"
             form="add-expense-form"
             disabled={isSubmitting}
-            className="w-full h-[56px] bg-primary text-on-primary rounded-full text-sm font-medium flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors shadow-sm active:scale-[0.98] pointer-events-auto"
+            className="w-full h-[56px] bg-primary text-on-primary rounded-full text-[14px] font-medium flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors shadow-sm active:scale-[0.98] pointer-events-auto"
           >
             <Check className="w-5 h-5" />
             Save Expense
