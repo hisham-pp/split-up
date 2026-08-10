@@ -6,7 +6,18 @@ import { RootState } from '@/store/store';
 import { closeAuthModal, setUser, setAuthError } from '@/store/slices/authSlice';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase/supabase';
 import { db } from '@/lib/db/db';
-import { X, Mail, Lock, User, LogIn, UserPlus, Sparkles } from 'lucide-react';
+import { X, Mail, Lock, User, LogIn, UserPlus, Sparkles, Check } from 'lucide-react';
+
+const PRESET_AVATARS = [
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=Zoe&backgroundColor=6366f1',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=Jack&backgroundColor=10b981',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=Maya&backgroundColor=f59e0b',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=Leo&backgroundColor=ec4899',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=Aria&backgroundColor=8b5cf6',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=Sam&backgroundColor=3b82f6',
+  'https://api.dicebear.com/7.x/bottts/svg?seed=Sparky&backgroundColor=06b6d4',
+  'https://api.dicebear.com/7.x/bottts/svg?seed=Gizmo&backgroundColor=f97316',
+];
 
 export const AuthModal: React.FC = () => {
   const dispatch = useDispatch();
@@ -15,6 +26,7 @@ export const AuthModal: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  const [selectedAvatar, setSelectedAvatar] = useState(PRESET_AVATARS[0]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!authModalOpen) return null;
@@ -33,7 +45,7 @@ export const AuthModal: React.FC = () => {
             email,
             password,
             options: {
-              data: { full_name: fullName },
+              data: { full_name: fullName, avatar_url: selectedAvatar },
             },
           });
           if (sbError) throw sbError;
@@ -42,11 +54,13 @@ export const AuthModal: React.FC = () => {
               id: data.user.id,
               email: data.user.email || email,
               fullName: fullName || email.split('@')[0],
+              avatarUrl: selectedAvatar,
             };
             await db.profiles.put({
               id: newUser.id,
               email: newUser.email,
               fullName: newUser.fullName,
+              avatarUrl: selectedAvatar,
               updatedAt: new Date().toISOString(),
             });
             dispatch(setUser(newUser));
@@ -63,11 +77,13 @@ export const AuthModal: React.FC = () => {
               id: data.user.id,
               email: data.user.email || email,
               fullName: data.user.user_metadata?.full_name || email.split('@')[0],
+              avatarUrl: data.user.user_metadata?.avatar_url || selectedAvatar,
             };
             await db.profiles.put({
               id: user.id,
               email: user.email,
               fullName: user.fullName,
+              avatarUrl: user.avatarUrl,
               updatedAt: new Date().toISOString(),
             });
             dispatch(setUser(user));
@@ -80,12 +96,14 @@ export const AuthModal: React.FC = () => {
           id: `usr_${Date.now()}`,
           email,
           fullName: fullName || email.split('@')[0],
+          avatarUrl: selectedAvatar,
         };
 
         await db.profiles.put({
           id: localUser.id,
           email: localUser.email,
           fullName: localUser.fullName,
+          avatarUrl: selectedAvatar,
           updatedAt: new Date().toISOString(),
         });
 
@@ -101,7 +119,7 @@ export const AuthModal: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in">
-      <div className="relative w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl overflow-hidden">
+      <div className="relative w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
         <button
           onClick={() => dispatch(closeAuthModal())}
           className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-200 rounded-full hover:bg-slate-800 transition-colors"
@@ -131,23 +149,55 @@ export const AuthModal: React.FC = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {authMode === 'signup' && (
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
-                Full Name
-              </label>
-              <div className="relative">
-                <User className="absolute left-3.5 top-3 w-4 h-4 text-slate-500" />
-                <input
-                  type="text"
-                  suppressHydrationWarning
-                  required
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="e.g. Hisham"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500"
-                />
+            <>
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-2">
+                  Choose Profile Avatar
+                </label>
+                <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 mb-3">
+                  {PRESET_AVATARS.map((avatar, idx) => {
+                    const isSelected = selectedAvatar === avatar;
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setSelectedAvatar(avatar)}
+                        className={`relative rounded-full overflow-hidden border-2 transition-all active:scale-95 ${
+                          isSelected
+                            ? 'border-indigo-500 ring-2 ring-indigo-500/30 scale-105'
+                            : 'border-slate-800 hover:border-slate-600 opacity-70 hover:opacity-100'
+                        }`}
+                      >
+                        <img src={avatar} alt={`Avatar ${idx + 1}`} className="w-10 h-10 object-cover" />
+                        {isSelected && (
+                          <div className="absolute inset-0 bg-indigo-600/40 flex items-center justify-center">
+                            <Check className="w-4 h-4 text-white" />
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  Full Name
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3.5 top-3 w-4 h-4 text-slate-500" />
+                  <input
+                    type="text"
+                    suppressHydrationWarning
+                    required
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="e.g. Sarah Connor"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+              </div>
+            </>
           )}
 
           <div>

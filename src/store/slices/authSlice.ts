@@ -23,7 +23,7 @@ const DEFAULT_GUEST_USER: UserProfile = {
   id: 'usr_guest',
   email: 'guest@splitup.app',
   fullName: 'Guest User',
-  avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+  avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Zoe&backgroundColor=6366f1',
   isGuest: true,
 };
 
