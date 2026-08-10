@@ -31,6 +31,11 @@ export const HomeView: React.FC = () => {
   const [totalGetBackCents, setTotalGetBackCents] = useState<number>(0);
   const [totalOweCents, setTotalOweCents] = useState<number>(0);
   const [searchQuery, setSearchQuery] = useState('');
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const loadData = async () => {
     const activeGroups = await db.groups.filter((g) => !g.deletedAt).toArray();
@@ -223,14 +228,17 @@ export const HomeView: React.FC = () => {
 
           <div className="relative mb-4">
             <Search className="absolute left-3.5 top-3 w-4 h-4 text-slate-500" />
-            <input
-              type="text"
-              suppressHydrationWarning
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search expenses by title or category..."
-              className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
-            />
+            {mounted ? (
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search expenses by title or category..."
+                className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
+              />
+            ) : (
+              <div className="w-full h-9 bg-slate-900 border border-slate-800 rounded-xl" />
+            )}
           </div>
 
           {filteredExpenses.length === 0 ? (

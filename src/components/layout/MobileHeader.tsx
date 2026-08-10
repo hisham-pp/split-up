@@ -31,8 +31,11 @@ export const MobileHeader: React.FC = () => {
             </button>
             <div className="flex items-center gap-2.5">
               <img
-                src={activeGroup.coverImage}
-                alt={activeGroup.name}
+                src={
+                  activeGroup.coverImage ||
+                  'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=600&q=80'
+                }
+                alt={activeGroup.name || 'Group'}
                 className="w-8 h-8 rounded-lg object-cover ring-1 ring-slate-700"
               />
               <div>
@@ -40,7 +43,9 @@ export const MobileHeader: React.FC = () => {
                   {activeGroup.name}
                 </h1>
                 <p className="text-xs text-slate-400">
-                  {activeGroup.members.length} members
+                  {Array.isArray(activeGroup?.members)
+                    ? `${activeGroup.members.length} members`
+                    : activeGroup?.category || 'Group'}
                 </p>
               </div>
             </div>
