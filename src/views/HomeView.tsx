@@ -118,52 +118,42 @@ export const HomeView: React.FC = () => {
   return (
     <PullToRefresh onRefresh={handleRefresh}>
       <div className="space-y-6 pb-6 animate-fade-in">
-        {/* Summary Cards Carousel */}
-        <div className="flex overflow-x-auto gap-4 hide-scrollbar pb-3 snap-x snap-mandatory w-[calc(100%+32px)] -ml-4 px-4">
-          {/* Net Balance Card */}
-          <div className="snap-center shrink-0 w-[280px] rounded-lg bg-surface-container-high border border-outline/20 p-4 flex flex-col gap-6 card-interaction relative overflow-hidden">
-            <div className="flex items-start justify-between relative z-10">
-              <span className="text-lg font-semibold text-on-surface-variant flex items-center gap-2">
-                <ArrowDownLeft className="w-5 h-5 text-secondary" />
-                Net Balance
-              </span>
-            </div>
-            <div className="relative z-10">
-              <span className="text-3xl font-bold text-secondary tracking-tight">
-                {netBalanceCents >= 0 ? '+' : '-'}
-                {formatCurrency(Math.abs(toMajorUnits(netBalanceCents)), currency)}
-              </span>
-            </div>
+        {/* Hero Card */}
+        <section className="bg-primary-container rounded-2xl p-6 flex flex-col gap-4 shadow-sm relative overflow-hidden">
+          <div className="text-base font-medium text-on-primary-container opacity-90 relative z-10">
+            Total Balance
           </div>
-          {/* You Owe Card */}
-          <div className="snap-center shrink-0 w-[240px] rounded-lg bg-surface-container-high border border-outline/20 p-4 flex flex-col gap-6 card-interaction relative overflow-hidden">
-            <div className="flex items-start justify-between relative z-10">
-              <span className="text-lg font-semibold text-on-surface-variant flex items-center gap-2">
-                <ArrowUpRight className="w-5 h-5 text-error" />
-                You Owe
-              </span>
-            </div>
-            <div className="relative z-10">
-              <span className="text-3xl font-bold text-error tracking-tight">
-                {formatCurrency(toMajorUnits(totalOweCents), currency)}
-              </span>
-            </div>
+          <div className="text-5xl font-normal text-on-primary-container tracking-tight relative z-10">
+            {netBalanceCents >= 0 ? '' : '-'}
+            {formatCurrency(Math.abs(toMajorUnits(netBalanceCents)), currency)}
           </div>
-          {/* You are Owed Card */}
-          <div className="snap-center shrink-0 w-[240px] rounded-lg bg-surface-container-high border border-outline/20 p-4 flex flex-col gap-6 card-interaction relative overflow-hidden">
-            <div className="flex items-start justify-between relative z-10">
-              <span className="text-lg font-semibold text-on-surface-variant flex items-center gap-2">
-                <ArrowDownLeft className="w-5 h-5 text-primary" />
-                You are Owed
-              </span>
-            </div>
-            <div className="relative z-10">
-              <span className="text-3xl font-bold text-primary tracking-tight">
-                {formatCurrency(toMajorUnits(totalGetBackCents), currency)}
-              </span>
-            </div>
+          <div className="text-sm font-normal text-on-primary-container opacity-80 relative z-10">
+            You are owed {formatCurrency(toMajorUnits(totalGetBackCents), currency)} • You owe {formatCurrency(toMajorUnits(totalOweCents), currency)}
           </div>
-        </div>
+          <button 
+            className="mt-2 w-max bg-surface text-primary font-medium text-sm rounded-full px-6 py-2 shadow-sm hover:opacity-90 active:scale-95 transition-all relative z-10"
+            onClick={() => dispatch(setActiveTab('groups'))}
+          >
+            Settle Up
+          </button>
+        </section>
+
+        {/* Quick Action Grid */}
+        <section className="grid grid-cols-4 gap-4">
+          {[
+            { icon: 'group_add', label: 'Add Group', action: () => dispatch(setActiveTab('groups')) },
+            { icon: 'payments', label: 'Settle', action: () => dispatch(setActiveTab('groups')) },
+            { icon: 'document_scanner', label: 'Scan Bill', action: () => dispatch(openAddExpenseSheet()) },
+            { icon: 'ios_share', label: 'Export', action: () => {} },
+          ].map((item, idx) => (
+            <div key={idx} onClick={item.action} className="flex flex-col items-center gap-1 cursor-pointer group">
+              <div className="w-14 h-14 bg-surface-container hover:bg-surface-container-high transition-colors rounded-xl flex items-center justify-center text-primary">
+                <span className="material-symbols-outlined" style={{ fontFamily: "'Material Symbols Outlined'" }}>{item.icon}</span>
+              </div>
+              <span className="text-xs font-medium text-on-surface text-center mt-1">{item.label}</span>
+            </div>
+          ))}
+        </section>
 
         {/* Quick Group Shortcuts */}
         <div>
@@ -227,10 +217,10 @@ export const HomeView: React.FC = () => {
           </div>
         </div>
 
-        {/* Expenses Feed with Search & Filter */}
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-base font-bold text-on-surface">Recent Expenses</h3>
+        {/* Expenses Feed */}
+        <div className="bg-surface-container-low rounded-2xl flex flex-col overflow-hidden pb-4">
+          <div className="flex items-center justify-between p-4 pb-2">
+            <h3 className="text-lg font-medium text-on-surface">Recent Activity</h3>
             <span className="text-xs text-on-surface-variant">Swipe to manage</span>
           </div>
 
