@@ -85,8 +85,8 @@ export const GroupsView: React.FC = () => {
       {/* Header & Create Group CTA */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-100 tracking-tight">Groups</h1>
-          <p className="text-xs text-slate-400 mt-0.5">Manage your shared expenses and trip groups</p>
+          <h1 className="text-2xl font-bold text-on-surface tracking-tight">Groups</h1>
+          <p className="text-xs text-on-surface-variant mt-0.5">Manage your shared expenses and trip groups</p>
         </div>
 
         <button
@@ -94,7 +94,7 @@ export const GroupsView: React.FC = () => {
             triggerHaptic(10);
             setIsGroupModalOpen(true);
           }}
-          className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-lg shadow-indigo-600/30 transition-all active:scale-95 flex items-center gap-1.5"
+          className="px-4 py-2.5 rounded-md bg-primary hover:bg-surface-variant text-on-primary hover:text-on-surface border border-outline/30 text-xs font-bold transition-all active:scale-95 flex items-center gap-1.5"
         >
           <Plus className="w-4 h-4" />
           <span>New Group</span>
@@ -104,17 +104,17 @@ export const GroupsView: React.FC = () => {
       {/* Search & Category Filter Pills */}
       <div className="space-y-3">
         <div className="relative">
-          <Search className="absolute left-3.5 top-3 w-4 h-4 text-slate-500" />
+          <Search className="absolute left-3.5 top-3 w-4 h-4 text-on-surface-variant" />
           {mounted ? (
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search groups by name..."
-              className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
+              className="w-full bg-surface-container border border-outline/30 rounded-md pl-10 pr-4 py-2 text-xs text-on-surface focus:outline-none focus:border-primary"
             />
           ) : (
-            <div className="w-full h-9 bg-slate-900 border border-slate-800 rounded-xl" />
+            <div className="w-full h-9 bg-surface-container border border-outline/30 rounded-md" />
           )}
         </div>
 
@@ -123,10 +123,10 @@ export const GroupsView: React.FC = () => {
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold shrink-0 transition-all ${
+              className={`px-3 py-1.5 rounded-sm border text-xs font-bold shrink-0 transition-all ${
                 selectedCategory === cat
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200'
+                  ? 'bg-surface-variant text-on-surface border-outline/30'
+                  : 'bg-surface border-outline/20 text-on-surface-variant hover:text-on-surface'
               }`}
             >
               {cat}
@@ -137,12 +137,12 @@ export const GroupsView: React.FC = () => {
 
       {/* Groups Grid */}
       {filteredGroups.length === 0 ? (
-        <div className="p-8 text-center bg-slate-900/40 rounded-2xl border border-slate-800">
-          <Layers className="w-8 h-8 text-indigo-400 mx-auto mb-2 opacity-60" />
-          <p className="text-sm font-medium text-slate-400">No groups found</p>
+        <div className="p-8 text-center bg-surface-container rounded-md border border-outline/20">
+          <Layers className="w-8 h-8 text-on-surface-variant mx-auto mb-2" />
+          <p className="text-sm font-medium text-on-surface-variant">No groups found</p>
           <button
             onClick={() => setIsGroupModalOpen(true)}
-            className="mt-3 text-xs font-semibold px-4 py-2 rounded-xl bg-indigo-600 text-white"
+            className="mt-3 text-xs font-bold px-4 py-2 rounded-md bg-primary text-on-primary hover:bg-surface-variant hover:text-on-surface border border-outline/30"
           >
             + Create your first group
           </button>
@@ -158,7 +158,7 @@ export const GroupsView: React.FC = () => {
                   triggerHaptic(10);
                   dispatch(setActiveGroup(group as any));
                 }}
-                className="group relative overflow-hidden rounded-3xl bg-slate-900 border border-slate-800 hover:border-indigo-500/50 p-5 shadow-xl transition-all cursor-pointer active:scale-95"
+                className="group relative overflow-hidden rounded-md bg-surface-container border border-outline/20 hover:border-primary p-5 transition-all cursor-pointer active:scale-95"
               >
                 <div className="flex items-center gap-4">
                   <img
@@ -167,23 +167,23 @@ export const GroupsView: React.FC = () => {
                       'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=600&q=80'
                     }
                     alt={group.name}
-                    className="w-14 h-14 rounded-2xl object-cover ring-1 ring-slate-700 shrink-0"
+                    className="w-14 h-14 rounded-md object-cover border border-outline/30 shrink-0"
                   />
 
                   <div className="min-w-0 flex-1">
-                    <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider">
+                    <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
                       {group.category}
                     </span>
-                    <h3 className="text-base font-bold text-slate-100 truncate group-hover:text-indigo-300 transition-colors">
+                    <h3 className="text-base font-bold text-on-surface truncate group-hover:text-primary transition-colors">
                       {group.name}
                     </h3>
                     <p
-                      className={`text-xs font-semibold mt-1 ${
+                      className={`text-xs font-bold mt-1 ${
                         netBal > 0
-                          ? 'text-emerald-400'
+                          ? 'text-primary'
                           : netBal < 0
-                          ? 'text-rose-400'
-                          : 'text-slate-400'
+                          ? 'text-error'
+                          : 'text-on-surface-variant'
                       }`}
                     >
                       {netBal > 0
@@ -194,7 +194,7 @@ export const GroupsView: React.FC = () => {
                     </p>
                   </div>
 
-                  <ChevronRight className="w-5 h-5 text-slate-600 group-hover:text-indigo-400 transition-colors shrink-0" />
+                  <ChevronRight className="w-5 h-5 text-on-surface-variant group-hover:text-primary transition-colors shrink-0" />
                 </div>
               </div>
             );

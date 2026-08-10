@@ -144,23 +144,23 @@ export const AuthModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in">
-      <div className="relative w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/95 backdrop-blur-md animate-fade-in">
+      <div className="relative w-full max-w-md bg-surface border border-outline/30 rounded-lg p-6 overflow-hidden max-h-[90vh] overflow-y-auto">
         <button
           onClick={() => dispatch(closeAuthModal())}
-          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-200 rounded-full hover:bg-slate-800 transition-colors"
+          className="absolute top-4 right-4 p-2 text-on-surface-variant hover:text-on-surface rounded-md hover:bg-surface-variant transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
 
         <div className="text-center mb-6">
-          <div className="w-12 h-12 bg-indigo-600/20 text-indigo-400 rounded-2xl flex items-center justify-center mx-auto mb-3">
+          <div className="w-12 h-12 bg-surface-variant text-on-surface border border-outline/30 rounded-md flex items-center justify-center mx-auto mb-3">
             <Sparkles className="w-6 h-6" />
           </div>
-          <h2 className="text-2xl font-bold text-slate-100">
+          <h2 className="text-2xl font-bold text-on-surface">
             {authMode === 'signup' ? 'Create an Account' : 'Welcome Back'}
           </h2>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-on-surface-variant mt-1 font-medium">
             {authMode === 'signup'
               ? 'Join Split Up to track and share expenses effortlessly'
               : 'Sign in to access your groups and balances'}
@@ -168,7 +168,7 @@ export const AuthModal: React.FC = () => {
         </div>
 
         {error && (
-          <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-medium">
+          <div className="mb-4 p-3 rounded-md bg-error/10 border border-error/30 text-error text-xs font-bold">
             {error}
           </div>
         )}
@@ -177,7 +177,7 @@ export const AuthModal: React.FC = () => {
           {authMode === 'signup' && (
             <>
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-2">
+                <label className="block text-xs font-bold text-on-surface mb-2">
                   Choose Profile Avatar
                 </label>
                 <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 mb-3">
@@ -188,15 +188,15 @@ export const AuthModal: React.FC = () => {
                         key={idx}
                         type="button"
                         onClick={() => setSelectedAvatar(avatar)}
-                        className={`relative rounded-full overflow-hidden border-2 transition-all active:scale-95 ${
+                        className={`relative rounded-md overflow-hidden border transition-all active:scale-95 ${
                           isSelected
-                            ? 'border-indigo-500 ring-2 ring-indigo-500/30 scale-105'
-                            : 'border-slate-800 hover:border-slate-600 opacity-70 hover:opacity-100'
+                            ? 'border-primary ring-2 ring-primary/30 scale-105'
+                            : 'border-outline hover:border-outline/50 opacity-70 hover:opacity-100'
                         }`}
                       >
                         <img src={avatar} alt={`Avatar ${idx + 1}`} className="w-10 h-10 object-cover" />
                         {isSelected && (
-                          <div className="absolute inset-0 bg-indigo-600/40 flex items-center justify-center">
+                          <div className="absolute inset-0 bg-primary/40 flex items-center justify-center">
                             <Check className="w-4 h-4 text-white" />
                           </div>
                         )}
@@ -207,11 +207,11 @@ export const AuthModal: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                <label className="block text-xs font-bold text-on-surface mb-1">
                   Full Name
                 </label>
                 <div className="relative">
-                  <User className="absolute left-3.5 top-3 w-4 h-4 text-slate-500" />
+                  <User className="absolute left-3.5 top-3 w-4 h-4 text-on-surface-variant" />
                   <input
                     type="text"
                     suppressHydrationWarning
@@ -219,7 +219,7 @@ export const AuthModal: React.FC = () => {
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="e.g. Sarah Connor"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500"
+                    className="w-full bg-surface-container border border-outline/30 rounded-md pl-10 pr-4 py-2.5 text-sm text-on-surface focus:outline-none focus:border-primary"
                   />
                 </div>
               </div>
@@ -227,11 +227,11 @@ export const AuthModal: React.FC = () => {
           )}
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="block text-xs font-bold text-on-surface mb-1">
               Email Address
             </label>
             <div className="relative">
-              <Mail className="absolute left-3.5 top-3 w-4 h-4 text-slate-500" />
+              <Mail className="absolute left-3.5 top-3 w-4 h-4 text-on-surface-variant" />
               <input
                 type="email"
                 suppressHydrationWarning
@@ -239,17 +239,17 @@ export const AuthModal: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500"
+                className="w-full bg-surface-container border border-outline/30 rounded-md pl-10 pr-4 py-2.5 text-sm text-on-surface focus:outline-none focus:border-primary"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="block text-xs font-bold text-on-surface mb-1">
               Password
             </label>
             <div className="relative">
-              <Lock className="absolute left-3.5 top-3 w-4 h-4 text-slate-500" />
+              <Lock className="absolute left-3.5 top-3 w-4 h-4 text-on-surface-variant" />
               <input
                 type="password"
                 suppressHydrationWarning
@@ -257,7 +257,7 @@ export const AuthModal: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500"
+                className="w-full bg-surface-container border border-outline/30 rounded-md pl-10 pr-4 py-2.5 text-sm text-on-surface focus:outline-none focus:border-primary"
               />
             </div>
           </div>
@@ -265,7 +265,7 @@ export const AuthModal: React.FC = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-semibold text-sm transition-all shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2"
+            className="w-full py-3 rounded-md bg-primary hover:bg-surface-variant text-on-primary hover:text-on-surface active:scale-95 border border-outline/30 font-bold text-sm transition-all flex items-center justify-center gap-2"
           >
             {authMode === 'signup' ? (
               <>
@@ -290,7 +290,7 @@ export const AuthModal: React.FC = () => {
                   : { type: 'auth/openAuthModal', payload: 'signup' }
               )
             }
-            className="text-xs text-indigo-400 hover:underline"
+            className="text-xs font-bold text-on-surface-variant hover:text-on-surface hover:underline transition-colors"
           >
             {authMode === 'signup'
               ? 'Already have an account? Sign in'

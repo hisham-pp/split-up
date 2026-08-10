@@ -1,9 +1,9 @@
 import type { Metadata, Viewport } from 'next';
-import { Space_Grotesk } from 'next/font/google';
+import { Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
 
-const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-sans' });
+const plusJakartaSans = Plus_Jakarta_Sans({ subsets: ['latin'], variable: '--font-sans' });
 
 export const metadata: Metadata = {
   title: 'SplitUp - Native Expense Sharing App',
@@ -47,7 +47,7 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
       </head>
-      <body className={`${spaceGrotesk.variable} antialiased bg-background text-on-background`} suppressHydrationWarning>
+      <body className={`${plusJakartaSans.variable} antialiased bg-background text-on-background`} suppressHydrationWarning>
         <Providers>{children}</Providers>
       </body>
     </html>

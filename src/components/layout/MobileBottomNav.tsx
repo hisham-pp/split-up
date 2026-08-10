@@ -42,10 +42,10 @@ export const MobileBottomNav: React.FC = () => {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-surface-container border-t border-outline/30 safe-nav-bottom transition-all duration-200"
+      className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-surface border-t border-outline/20 safe-nav-bottom transition-all duration-200"
       aria-label="Mobile Navigation"
     >
-      <div className="grid grid-cols-4 items-center h-16 max-w-md mx-auto px-2">
+      <div className="grid grid-cols-4 items-center h-20 max-w-md mx-auto px-2 pb-2">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
@@ -54,17 +54,17 @@ export const MobileBottomNav: React.FC = () => {
             <button
               key={item.id}
               onClick={() => handleTabClick(item.id)}
-              className={`relative flex flex-col items-center justify-center h-full py-1 rounded-md transition-all duration-200 active:scale-95 ${
-                isActive ? 'text-primary font-semibold' : 'text-on-surface-variant hover:text-on-surface'
+              className={`relative flex flex-col items-center justify-center h-full pt-1 pb-1 transition-all duration-200 active:scale-95 ${
+                isActive ? 'text-on-surface font-semibold' : 'text-on-surface-variant hover:text-on-surface'
               }`}
             >
-              {isActive && (
-                <span className="absolute inset-x-2 inset-y-1 bg-surface-variant rounded-md border border-outline/20 -z-10 animate-fade-in" />
-              )}
-              <div className={`p-1 transition-transform duration-200 ${isActive ? '-translate-y-0.5 scale-110' : ''}`}>
-                <Icon className="w-5 h-5 stroke-[2]" />
+              <div className="relative flex items-center justify-center w-16 h-8 mb-1 transition-all duration-200">
+                {isActive && (
+                  <span className="absolute inset-0 bg-primary-container rounded-full -z-10 animate-fade-in" />
+                )}
+                <Icon className={`w-5 h-5 stroke-[2] ${isActive ? 'text-on-primary-container' : 'text-on-surface-variant'}`} />
               </div>
-              <span className="text-[11px] tracking-tight leading-none mt-0.5">
+              <span className="text-[11px] tracking-tight leading-none">
                 {item.label}
               </span>
             </button>
