@@ -282,6 +282,7 @@ async function executeRemoteMutation(item: SyncQueueItem) {
 async function pullRemoteChanges() {
   if (!supabase) return;
 
+  // Pull groups
   const { data: remoteGroups } = await supabase.from('groups').select('*').is('deleted_at', null);
 
   if (remoteGroups && remoteGroups.length > 0) {
@@ -298,6 +299,26 @@ async function pullRemoteChanges() {
     }
   }
 
+  // Pull group members — critical for invite flow: when someone joins,
+  // their membership is pushed to Supabase but must be pulled on all other devices.
+  const { data: remoteMembers } = await supabase.from('group_members').select('*');
+
+  if (remoteMembers && remoteMembers.length > 0) {
+    for (const m of remoteMembers) {
+      await db.groupMembers.put({
+        id: m.id,
+        groupId: m.group_id,
+        userId: m.user_id,
+        memberName: m.member_name,
+        memberEmail: m.member_email,
+        memberAvatar: m.member_avatar,
+        role: m.role || 'member',
+        joinedAt: m.joined_at,
+      });
+    }
+  }
+
+  // Pull expenses
   const { data: remoteExpenses } = await supabase.from('expenses').select('*').is('deleted_at', null);
 
   if (remoteExpenses && remoteExpenses.length > 0) {
@@ -314,6 +335,57 @@ async function pullRemoteChanges() {
         createdBy: re.created_by,
         createdAt: re.created_at,
         updatedAt: re.updated_at,
+      });
+    }
+  }
+
+  // Pull expense payers
+  const { data: remotePayers } = await supabase.from('expense_payers').select('*');
+
+  if (remotePayers && remotePayers.length > 0) {
+    for (const p of remotePayers) {
+      await db.expensePayers.put({
+        id: p.id,
+        expenseId: p.expense_id,
+        memberId: p.member_id,
+        amountCents: p.amount_cents,
+      });
+    }
+  }
+
+  // Pull expense splits
+  const { data: remoteSplits } = await supabase.from('expense_splits').select('*');
+
+  if (remoteSplits && remoteSplits.length > 0) {
+    for (const s of remoteSplits) {
+      await db.expenseSplits.put({
+        id: s.id,
+        expenseId: s.expense_id,
+        memberId: s.member_id,
+        amountCents: s.amount_cents,
+        percentage: s.percentage,
+        shares: s.shares,
+      });
+    }
+  }
+
+  // Pull settlements
+  const { data: remoteSettlements } = await supabase.from('settlements').select('*').is('deleted_at', null);
+
+  if (remoteSettlements && remoteSettlements.length > 0) {
+    for (const st of remoteSettlements) {
+      await db.settlements.put({
+        id: st.id,
+        groupId: st.group_id,
+        payerMemberId: st.payer_member_id,
+        payeeMemberId: st.payee_member_id,
+        amountCents: st.amount_cents,
+        date: st.date,
+        notes: st.notes,
+        createdBy: st.created_by,
+        createdAt: st.created_at,
+        updatedAt: st.updated_at,
+        deletedAt: st.deleted_at,
       });
     }
   }
