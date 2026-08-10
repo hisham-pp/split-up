@@ -85,26 +85,9 @@ export default function JoinGroupPage({ params }: { params: Promise<{ inviteCode
         }
 
         if (!foundGroup) {
-          // Fallback: Generate local group record so invite links ALWAYS work seamlessly
-          foundGroup = {
-            id: groupId,
-            name: 'Shared Expense Group',
-            category: 'Travel',
-            coverImage: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=600&q=80',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          };
-          await db.groups.put(foundGroup);
-
-          // Seed default creator member if empty
-          const defaultCreator: LocalGroupMember = {
-            id: `mb_${Date.now()}_creator`,
-            groupId: groupId,
-            memberName: 'Group Host',
-            role: 'owner',
-            joinedAt: new Date().toISOString(),
-          };
-          await db.groupMembers.put(defaultCreator);
+          setError('Group not found. This invite link may be invalid or expired.');
+          setLoading(false);
+          return;
         }
 
         setGroup(foundGroup);
