@@ -57,6 +57,12 @@ export async function queueMutation(operation: QueueOperation, payload: any) {
   }
 }
 
+function sanitizeUuid(id?: string | null): string | null {
+  if (!id) return null;
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+  return isUuid ? id : null;
+}
+
 /**
  * Main Sync Loop: Processes pending items in the offline queue and pulls server updates.
  */
@@ -75,6 +81,12 @@ export async function processSyncQueue() {
   notifyStatus();
 
   try {
+    // Reset any failed items so they get a fresh retry with sanitized payloads
+    const failedItems = await db.syncQueue.where('status').equals('failed').toArray();
+    for (const fItem of failedItems) {
+      await db.syncQueue.update(fItem.id, { status: 'pending', retries: 0 });
+    }
+
     const pendingItems = await db.syncQueue
       .where('status')
       .equals('pending')
@@ -127,7 +139,7 @@ async function executeRemoteMutation(item: SyncQueueItem) {
         name: payload.name,
         category: payload.category,
         cover_image: payload.coverImage,
-        created_by: payload.createdBy,
+        created_by: sanitizeUuid(payload.createdBy),
         created_at: payload.createdAt,
         updated_at: payload.updatedAt,
       });
@@ -155,7 +167,7 @@ async function executeRemoteMutation(item: SyncQueueItem) {
       const { error } = await supabase.from('group_members').upsert({
         id: payload.id,
         group_id: payload.groupId,
-        user_id: payload.userId || null,
+        user_id: sanitizeUuid(payload.userId),
         member_name: payload.memberName,
         member_email: payload.memberEmail || null,
         member_avatar: payload.memberAvatar || null,
@@ -182,7 +194,7 @@ async function executeRemoteMutation(item: SyncQueueItem) {
         split_mode: expense.splitMode,
         date: expense.date,
         notes: expense.notes,
-        created_by: expense.createdBy,
+        created_by: sanitizeUuid(expense.createdBy),
         created_at: expense.createdAt,
         updated_at: expense.updatedAt,
       });
@@ -231,7 +243,7 @@ async function executeRemoteMutation(item: SyncQueueItem) {
         amount_cents: payload.amountCents,
         date: payload.date,
         notes: payload.notes,
-        created_by: payload.createdBy,
+        created_by: sanitizeUuid(payload.createdBy),
         created_at: payload.createdAt,
         updated_at: payload.updatedAt,
       });
