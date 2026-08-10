@@ -23,7 +23,7 @@ import {
 
 export const AddExpenseSheet: React.FC = () => {
   const dispatch = useDispatch();
-  const isSheetOpen = useSelector((state: RootState) => state.ui.isAddExpenseSheetOpen);
+  const isSheetOpen = useSelector((state: RootState) => state.ui.addExpenseSheetOpen);
   const activeGroup = useSelector((state: RootState) => state.ui.activeGroup);
 
   const [title, setTitle] = useState('');

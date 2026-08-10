@@ -48,7 +48,11 @@ export const HomeView: React.FC = () => {
       const gMembers = await db.groupMembers.where('groupId').equals(g.id).toArray();
       const memberIds = gMembers.map((m) => m.id);
 
-      const gExp = await db.expenses.where('groupId').equals(g.id).where('deletedAt').equals(null).toArray();
+      const gExp = await db.expenses
+        .where('groupId')
+        .equals(g.id)
+        .filter((e) => e.deletedAt === null || e.deletedAt === undefined)
+        .toArray();
       const expList = [];
 
       for (const e of gExp) {
@@ -57,7 +61,11 @@ export const HomeView: React.FC = () => {
         expList.push({ payers, splits });
       }
 
-      const gStl = await db.settlements.where('groupId').equals(g.id).where('deletedAt').equals(null).toArray();
+      const gStl = await db.settlements
+        .where('groupId')
+        .equals(g.id)
+        .filter((s) => s.deletedAt === null || s.deletedAt === undefined)
+        .toArray();
 
       const computed = computeGroupBalances(memberIds, expList, gStl);
 

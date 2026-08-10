@@ -153,13 +153,13 @@ export const ProfileView: React.FC = () => {
 
         <select
           value={currency}
-          onChange={(e) => dispatch(setCurrency(e.target.value))}
+          onChange={(e) => dispatch(setCurrency(e.target.value as any))}
           className="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-xs font-bold text-indigo-400 outline-none focus:border-indigo-500"
         >
-          <option value="INR">₹ INR (Rupees)</option>
-          <option value="USD">$ USD (Dollars)</option>
-          <option value="EUR">€ EUR (Euros)</option>
-          <option value="GBP">£ GBP (Pounds)</option>
+          <option value="₹">₹ INR (Rupees)</option>
+          <option value="$">$ USD (Dollars)</option>
+          <option value="€">€ EUR (Euros)</option>
+          <option value="£">£ GBP (Pounds)</option>
         </select>
       </div>
 

@@ -1,11 +1,16 @@
-import { CurrencySymbol } from '@/store/slices/uiSlice';
-
-export const formatCurrency = (amount: number, currency: CurrencySymbol = '₹'): string => {
+export const formatCurrency = (amount: number, currency: string = '₹'): string => {
   const formattedNumber = Math.abs(amount).toLocaleString('en-IN', {
     maximumFractionDigits: 2,
   });
 
-  return `${currency}${formattedNumber}`;
+  // Map currency codes if passed as INR/USD/EUR/GBP
+  let symbol = currency;
+  if (currency === 'INR') symbol = '₹';
+  else if (currency === 'USD') symbol = '$';
+  else if (currency === 'EUR') symbol = '€';
+  else if (currency === 'GBP') symbol = '£';
+
+  return `${symbol}${formattedNumber}`;
 };
 
 export const formatDateRelative = (dateString: string): string => {
